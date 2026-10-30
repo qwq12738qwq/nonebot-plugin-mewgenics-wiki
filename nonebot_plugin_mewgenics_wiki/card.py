@@ -12,6 +12,7 @@ from markupsafe import Markup
 
 from .config import CATEGORY_LABELS
 from .data import CLASS_LABELS, WikiEntry, snapshot_version
+from .version import plugin_version
 
 TYPE_LABELS = {
     "melee": "近战",
@@ -615,39 +616,6 @@ def _entry_icon_uri(entry: WikiEntry) -> str | None:
     return None
 
 
-def _class_preview_section(
-    entries: tuple[WikiEntry, ...], limit: int = 18
-) -> str:
-    if not entries:
-        return ""
-    items = []
-    for entry in entries[:limit]:
-        uri = _entry_icon_uri(entry)
-        if not uri:
-            continue
-        items.append(
-            '<div class="preview-item">'
-            f'<div class="preview-icon"><img src="{uri}" '
-            f'alt="{html.escape(entry.title)}"></div>'
-            f'<div class="preview-name">{html.escape(entry.title)}</div>'
-            "</div>"
-        )
-    if not items:
-        return ""
-    note = ""
-    if len(entries) > len(items):
-        note = (
-            f'<div class="more-note">还有 {len(entries) - len(items)} '
-            "个能力未展示</div>"
-        )
-    return (
-        '<div class="section">'
-        '<div class="section-title">职业能力预览</div>'
-        f'<div class="class-preview-grid">{"".join(items)}</div>'
-        f"{note}</div>"
-    )
-
-
 def _class_meta(entry: WikiEntry) -> str:
     raw = entry.raw
     parts = []
@@ -710,7 +678,6 @@ def _class_card(entry: WikiEntry) -> dict[str, str]:
     raw = entry.raw
     passives = tuple(raw.get("passives") or ())
     abilities = tuple(raw.get("abilities") or ())
-    preview = tuple(raw.get("preview") or ())
 
     badges = [
         _badge(f"{len(passives)} 个被动"),
@@ -718,7 +685,6 @@ def _class_card(entry: WikiEntry) -> dict[str, str]:
     ]
     body = "".join(
         [
-            _class_preview_section(preview),
             _class_entries_section("被动", passives, "passive"),
             _class_entries_section("能力", abilities, "ability"),
         ]
@@ -774,6 +740,9 @@ def build_card(category: str, entry: WikiEntry) -> str:
         desc_html=Markup(data["desc_html"]),
         tags_html=Markup(data["tags_html"]),
         body_html=Markup(data.get("body_html", "")),
-        footer_left=f"Mewgenics Wiki · VersionDate {version}",
+        footer_left=(
+            f"Mewgenics Wiki · 插件 v{plugin_version()} · "
+            f"数据快照 {version}"
+        ),
         footer_right="By: qwq12738qwq·THNEden 数据来源: mewcodex.pages.dev",
     )

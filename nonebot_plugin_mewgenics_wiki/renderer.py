@@ -9,13 +9,14 @@ from .card import build_card
 from .compat import HTMLRENDER_VERSION, ensure_htmlrender_backend
 from .config import Config
 from .data import WikiEntry, snapshot_cache_key
+from .version import plugin_version
 
 ensure_htmlrender_backend()
 require("nonebot_plugin_htmlrender")
 
 from nonebot_plugin_localstore import get_plugin_cache_dir
 
-_LAYOUT_VERSION = "10"
+_LAYOUT_VERSION = "11"
 
 
 async def _render_png(
@@ -44,7 +45,7 @@ async def _render_png(
         "quality": None,
         "device_scale_factor": device_pixel_ratio,
         "screenshot_timeout": timeout_seconds * 1000,
-        "viewport": {"width": width, "height": 800},
+        "viewport": {"width": width, "height": 10},
     }
     if HTMLRENDER_VERSION >= (0, 7, 0):
         kwargs["full_page"] = True
@@ -53,7 +54,7 @@ async def _render_png(
 
 def _card_path(category: str, entry: WikiEntry, config: Config) -> Path:
     key = (
-        f"{entry.code}|{_LAYOUT_VERSION}|"
+        f"{entry.code}|{_LAYOUT_VERSION}|{plugin_version()}|"
         f"{config.mewgenics_wiki_card_width}|"
         f"{config.mewgenics_wiki_device_pixel_ratio}"
     )
