@@ -15,7 +15,7 @@ require("nonebot_plugin_htmlrender")
 
 from nonebot_plugin_localstore import get_plugin_cache_dir
 
-_LAYOUT_VERSION = "10"
+_LAYOUT_VERSION = "11"
 
 
 async def _render_png(

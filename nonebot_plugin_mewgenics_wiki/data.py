@@ -316,14 +316,6 @@ def load_classes() -> tuple[WikiEntry, ...]:
             if entry.raw.get("ability_class") == class_name
             and not _is_special_class_ability(entry)
         )
-        preview = tuple(
-            entry
-            for entry in class_abilities
-            if f"{class_name}.ability_pool"
-            in [str(pool) for pool in entry.raw.get("ability_pools") or []]
-        )
-        if not preview:
-            preview = class_abilities[:8]
 
         label = CLASS_LABELS.get(class_name, class_name)
         classes.append(
@@ -338,7 +330,6 @@ def load_classes() -> tuple[WikiEntry, ...]:
                     "class": class_name,
                     "passives": class_passives,
                     "abilities": class_abilities,
-                    "preview": preview,
                 },
                 f"{label}\n{class_name}\n职业".casefold(),
             )
