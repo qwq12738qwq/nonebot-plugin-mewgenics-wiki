@@ -1,7 +1,7 @@
 [project]
 name = "nonebot-plugin-mewgenics-wiki"
 version = "0.1.2"
-description = "Mewgenics Wiki 图鉴查询插件，生成站点风格卡片"
+description = "Mewgenics Wiki 图鉴查询插件"
 requires-python = ">=3.10"
 dependencies = [
     "nonebot2>=2.5.0",
