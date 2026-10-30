@@ -2,11 +2,9 @@ name: pypi-publish
 
 on:
   push:
-    tags: ["v*"]
+    tags:
+      - "v*"
   workflow_dispatch:
-    inputs:
-      version:
-        required: true
 
 permissions:
   contents: read
