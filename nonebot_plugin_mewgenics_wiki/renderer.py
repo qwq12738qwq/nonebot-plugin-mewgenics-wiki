@@ -9,6 +9,7 @@ from .card import build_card
 from .compat import HTMLRENDER_VERSION, ensure_htmlrender_backend
 from .config import Config
 from .data import WikiEntry, snapshot_cache_key
+from .version import plugin_version
 
 ensure_htmlrender_backend()
 require("nonebot_plugin_htmlrender")
@@ -53,7 +54,7 @@ async def _render_png(
 
 def _card_path(category: str, entry: WikiEntry, config: Config) -> Path:
     key = (
-        f"{entry.code}|{_LAYOUT_VERSION}|"
+        f"{entry.code}|{_LAYOUT_VERSION}|{plugin_version()}|"
         f"{config.mewgenics_wiki_card_width}|"
         f"{config.mewgenics_wiki_device_pixel_ratio}"
     )
