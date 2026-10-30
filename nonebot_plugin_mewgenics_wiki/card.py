@@ -774,6 +774,6 @@ def build_card(category: str, entry: WikiEntry) -> str:
         desc_html=Markup(data["desc_html"]),
         tags_html=Markup(data["tags_html"]),
         body_html=Markup(data.get("body_html", "")),
-        footer_left=f"Mewgenics Wiki · 数据快照 {version}",
-        footer_right="来源：Mewcodex 图鉴",
+        footer_left=f"Mewgenics Wiki · VersionDate {version}",
+        footer_right="来源: mewcodex.pages.dev",
     )
