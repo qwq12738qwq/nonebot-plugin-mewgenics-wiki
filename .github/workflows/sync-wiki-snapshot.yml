@@ -1,0 +1,69 @@
+name: sync-wiki-snapshot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Check every-other-week schedule
+        id: schedule
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          python - <<'PY'
+          import datetime
+          import os
+
+          week = datetime.datetime.now(datetime.UTC).isocalendar().week
+          run = os.environ["EVENT_NAME"] == "workflow_dispatch" or week % 2 == 0
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              print(f"run={'true' if run else 'false'}", file=f)
+          PY
+
+      - name: Install build tools
+        if: steps.schedule.outputs.run == 'true'
+        run: pip install fonttools brotli
+
+      - name: Sync data and assets
+        if: steps.schedule.outputs.run == 'true'
+        run: python scripts/sync_wiki_snapshot.py --asset-workers 4
+
+      - name: Check for changes
+        id: changed
+        if: steps.schedule.outputs.run == 'true'
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Rebuild font subset
+        if: steps.changed.outputs.changed == 'true'
+        run: python scripts/build_font_subset.py
+
+      - name: Create snapshot patch
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          git add -A
+          git diff --cached --binary > wiki-snapshot.patch
+
+      - name: Upload snapshot patch
+        if: steps.changed.outputs.changed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: wiki-snapshot-${{ github.run_number }}
+          path: wiki-snapshot.patch
