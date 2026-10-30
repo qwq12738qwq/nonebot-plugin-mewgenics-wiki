@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "snapshot_version": "2026.10.30",
+  "generated_at": "2026-10-30T07:34:20+00:00",
+  "source": "https://mewcodex.pages.dev",
+  "counts": {
+    "abilities": 2316,
+    "passives": 511,
+    "items": 1134,
+    "mutations": 760,
+    "characters": 719
+  },
+  "data": {
+    "abilities_combined.json": {
+      "sha256": "c54dd249125866e99d195351f3f892ca0c9e03fd92ea8e7de27b842dcc609d42",
+      "size": 5267694
+    },
+    "passives_combined.json": {
+      "sha256": "2d3b019cdff9ab7f6e320ac86cebbf87333d60cf2fbb9d55b5774cc7d05e8d01",
+      "size": 795086
+    },
+    "items_db.json": {
+      "sha256": "a5ea1d6ba73acc5d93432d1351c43dfdbb26e64fedfed739a5d37939afb607af",
+      "size": 1170333
+    },
+    "mutations_combined.json": {
+      "sha256": "73f734b3471f382e84396f21a430a52c2f8c97128c4af99586684840f318f03c",
+      "size": 531512
+    },
+    "characters_db.json": {
+      "sha256": "4fbd66298225209d5d03319fe5e8d33ce3f5b03b81ff03b969e6b6a49ca1d57b",
+      "size": 1861383
+    }
+  },
+  "etags": {
+    "abilities_combined.json": "\"d2e625c7a0ccdc5f33045152b541e615\"",
+    "passives_combined.json": "\"777653b59c6c52872d070551aaf01dfd\"",
+    "items_db.json": "\"11eaa372c89640f3020a81a6a2506c42\"",
+    "mutations_combined.json": "\"ccd6e6510741ebd3c71e8f86c3d9e0f2\"",
+    "characters_db.json": "\"3c371b3dbf3550ee9dc11e710f4213db\""
+  },
+  "asset_count": 2854,
+  "missing_assets": []
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <style>{{ css|safe }}</style>
+</head>
+<body>
+<div class="wiki-card {{ category }}">
+    <div class="card-head {{ category }}-head">
+        {{ icon_html|safe }}
+        <div class="head-info">
+            <div class="eyebrow">{{ eyebrow }}</div>
+            <h1>{{ title }}</h1>
+            {% if subtitle %}<div class="subtitle">{{ subtitle }}</div>{% endif %}
+            {% if badges_html %}<div class="badges">{{ badges_html|safe }}</div>{% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        {% if body_html %}
+            {{ body_html|safe }}
+        {% else %}
+            {% if stats_html %}
+            <div class="section">
+                <div class="section-title">属性</div>
+                {{ stats_html|safe }}
+            </div>
+            {% endif %}
+            {% if desc_html %}
+            <div class="section">
+                <div class="section-title">描述</div>
+                {{ desc_html|safe }}
+            </div>
+            {% endif %}
+            {% if tags_html %}
+            <div class="section">
+                <div class="section-title">标签</div>
+                <div class="tags">{{ tags_html|safe }}</div>
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="card-foot">
+        <span>{{ footer_left }}</span>
+        <span class="right">{{ footer_right }}</span>
+    </div>
+</div>
+</body>
+</html>

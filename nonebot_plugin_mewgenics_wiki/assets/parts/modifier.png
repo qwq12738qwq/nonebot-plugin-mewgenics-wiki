@@ -1,0 +1,3777 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ability Viewer | Mewgenics Encyclopedia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --theme: #9f978b;
+            --theme-dark: #7f776b;
+            --theme-light: #c9c1b7;
+            --theme-bg: #efece7;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #efece7 0%, #c9c1b7 100%);
+            min-height: 100vh;
+            padding: 36px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            box-shadow: inset 0 0 140px rgba(32, 28, 22, 0.6), inset 0 0 300px rgba(32, 28, 22, 0.45);
+            z-index: 10;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid rgba(159, 151, 139, 0.35);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25), 0 0 0 6px rgba(159, 151, 139, 0.18);
+            overflow: hidden;
+            position: relative;
+            z-index: 0;
+        }
+
+        .language-toggle {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 2;
+            font-size: 0.95em;
+        }
+
+        .language-toggle .lang-link {
+            background: rgba(245, 245, 245, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            padding: 4px 8px;
+            cursor: pointer;
+            color: #4b453d;
+            text-decoration: none;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+            border-radius: 999px;
+        }
+
+        .language-toggle .lang-link.active {
+            color: #2f2a23;
+            background: rgba(245, 245, 245, 0.95);
+        }
+
+        .language-toggle .lang-separator {
+            color: #4b453d;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+        }
+
+        .header-image {
+            display: block;
+            width: 100%;
+            max-width: 960px;
+            height: 240px;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .header-image-wrap {
+            display: flex;
+            justify-content: center;
+            background: linear-gradient(135deg, #9f978b 0%, #7f776b 100%);
+            padding: 12px 16px;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #827a6e 0%, #6d6559 100%);
+            border-bottom: 2px solid rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            padding: 0;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .navbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .navbar a {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            padding: 14px 32px;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            flex: 0 0 auto;
+        }
+
+        .navbar a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .navbar a.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-bottom-color: #efece7;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #9f978b 0%, #7f776b 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px;
+            background: #f3f1ee;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .controls input,
+        .controls select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .controls input {
+            width: 100%;
+            padding-right: 35px;
+        }
+
+        .clear-button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 1.3em;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .clear-button:hover {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .clear-button.visible {
+            display: flex;
+        }
+
+        .visibility-controls {
+            padding: 12px 20px 0;
+            background: #f3f1ee;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .visibility-controls label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #5b534a;
+            font-size: 0.95em;
+        }
+
+        .visibility-note {
+            flex: 1;
+            text-align: center;
+            font-size: 0.9em;
+            color: #5b534a;
+            min-width: 240px;
+        }
+
+        .stats {
+            padding: 20px;
+            background: #f7f4f0;
+            display: flex;
+            gap: 20px;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .pagination-controls {
+            padding: 12px 20px;
+            display: flex;
+            justify-content: center;
+            background: #f7f4f0;
+            border-bottom: 1px solid #ddd;
+            color: #5b534a;
+            font-size: 0.9em;
+        }
+
+        .pagination-controls-inner {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+        }
+
+        .pagination-controls button {
+            border: 1px solid rgba(159, 151, 139, 0.4);
+            background: #f7f4f0;
+            color: #5b534a;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .pagination-controls button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination-controls select {
+            border: 1px solid rgba(159, 151, 139, 0.4);
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.9em;
+        }
+
+        .stat-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .stats-select {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.95em;
+            background: white;
+        }
+
+        .stats-note {
+            flex-basis: 100%;
+            font-size: 0.9em;
+            color: #7c7468;
+            margin-top: 6px;
+        }
+
+        .stat-label {
+            font-weight: 600;
+            color: #9f978b;
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        .icon-header {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 960px;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f3f1ee;
+            border-bottom: 2px solid #ddd;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+            min-width: 120px;
+        }
+
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        th.sortable:hover {
+            background: rgba(159, 151, 139, 0.1);
+        }
+
+        th .sort-indicator {
+            margin-left: 5px;
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        th.sort-asc .sort-indicator::after {
+            content: '▲';
+            color: #9f978b;
+        }
+
+        th.sort-desc .sort-indicator::after {
+            content: '▼';
+            color: #9f978b;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f7f4f0;
+        }
+
+        td {
+            padding: 12px 15px;
+            vertical-align: top;
+            min-width: 120px;
+        }
+
+        .frame-cell {
+            text-align: center;
+            font-weight: 600;
+            color: #9f978b;
+        }
+
+        .class-cell {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .image-cell {
+            text-align: left;
+        }
+
+        .icon-and-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .icon-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0px;
+        }
+
+        .icon-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-part {
+            position: relative;
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            --ability-icon-size: 72px;
+            --ability-icon-padding: 4px;
+            --type-icon-size: 55px;
+            --type-icon-gap: 2px;
+            --type-icon-overlap: -15px;
+            transform: translateY(-15px);
+        }
+
+        .ability-icon-stack {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--type-icon-gap);
+        }
+
+        .ability-icon-stack::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: calc(var(--type-icon-size) / 2);
+            width: calc(var(--ability-icon-size) + (var(--ability-icon-padding) * 2));
+            height: calc(var(--ability-icon-size) + var(--ability-icon-padding) + (var(--type-icon-size) / 2) + var(--type-icon-gap) + var(--type-icon-overlap));
+            transform: translateX(-50%);
+            background: var(--icon-bg, #f3efe7);
+            border: 4px solid #000;
+            border-radius: 5px;
+            z-index: 0;
+        }
+
+        .ability-type-icon {
+            width: auto;
+            height: var(--type-icon-size);
+            aspect-ratio: 95 / 110;
+            margin-bottom: var(--type-icon-overlap);
+            image-rendering: pixelated;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ability-icon {
+            align-self: center;
+        }
+
+        .tags-line {
+            font-size: 0.75em;
+            display: flex;
+            gap: 0px;
+            align-items: center;
+            position: absolute;
+            left: -2px;
+            top: calc(var(--type-icon-size) + var(--type-icon-gap) - 20px);
+            width: auto;
+            flex: initial;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            min-height: 0px;
+            line-height: 1;
+            z-index: 2;
+        }
+
+        .tags-line.upgraded {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 0;
+        }
+
+        .tag-icon-small {
+            width: 12px;
+            height: 12px;
+            display: inline-block;
+            image-rendering: pixelated;
+        }
+
+        .stats-stack {
+            display: flex;
+            flex-direction: column;
+            min-width: 130px;
+        }
+
+        .ability-icon {
+            width: var(--ability-icon-size);
+            height: var(--ability-icon-size);
+            object-fit: contain;
+            border-radius: 4px;
+            cursor: zoom-in;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ability-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .ability-icon-placeholder {
+            width: var(--ability-icon-size);
+            height: var(--ability-icon-size);
+            border-radius: 4px;
+            border: 2px dashed #ccc;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 0.7em;
+            text-align: center;
+            padding: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ability-stats {
+            display: flex;
+            justify-content: flex-start;
+            gap: 12px;
+            margin-top: 0;
+            font-size: 0.85em;
+        }
+
+        .ability-stats.detailed {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .ability-stats.upgraded {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #ddd;
+        }
+
+        .stat-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .stat-icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #333;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .stat-value.detailed {
+            min-width: 0;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .stat-value.formula {
+            color: #f39c12;
+            font-style: italic;
+        }
+
+        .stat-value.detailed.formula {
+            color: #333;
+            font-style: normal;
+        }
+
+        .stat-group[title] {
+            cursor: help;
+        }
+
+        .stat-line {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .detail-toggle {
+            border: 1px solid #c9c2b6;
+            background: #f7f4f0;
+            color: #3e3b36;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+
+        .detail-toggle.header-toggle {
+            padding: 4px 10px;
+            font-size: 0.8em;
+        }
+
+        .detail-toggle.active {
+            background: #e8e1d6;
+        }
+
+        .ability-name {
+            font-weight: 600;
+            color: #333;
+            word-break: break-word;
+        }
+
+        .ability-name-upgraded {
+            margin-top: 8px;
+        }
+
+        .ability-class {
+            display: inline-block;
+            background: #9f978b;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            margin-top: 4px;
+        }
+
+        .pool-cell {
+            min-width: 160px;
+        }
+
+        .class-fighter {
+            background: #de9494;
+        }
+
+        .class-thief {
+            background: #fffbb5;
+            color: #000;
+        }
+
+        .class-tank {
+            background: #857348;
+        }
+
+        .class-mage {
+            background: #a6a6c9;
+        }
+
+        .class-medic {
+            background: #e2e2e2;
+            color: #000;
+        }
+
+        .class-hunter {
+            background: #425d3d;
+        }
+
+        .class-necromancer {
+            background: #131313;
+        }
+
+        .class-butcher {
+            background: #ac4457;
+        }
+
+        .class-monk {
+            background: #787878;
+        }
+
+        .class-druid {
+            background: #5b4237;
+        }
+
+        .class-psychic {
+            background: #645379;
+        }
+
+        .class-tinkerer {
+            background: #6bdfbe;
+            color: #000;
+        }
+
+        .class-jester {
+            background: linear-gradient(135deg, #a66d6d 0%, #93bec6 50%, #a2c476 100%);
+            color: #333;
+        }
+
+        .class-colorless {
+            background: #c1c1c1;
+            color: #000;
+        }
+
+        .class-other {
+            background: #ffffff;
+        }
+
+        .description {
+            color: #666;
+            font-size: 0.95em;
+            word-break: break-word;
+            max-width: 300px;
+            line-height: 1.4;
+        }
+
+        .description b,
+        .description strong {
+            font-weight: 700;
+            color: #333;
+        }
+
+        .source-comment {
+            color: #888;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 8px;
+            padding: 6px;
+            background: #f9f9f9;
+            border-left: 3px solid #9f978b;
+            border-radius: 2px;
+        }
+
+        .source-comment a,
+        .source-comment a:visited,
+        .source-comment a:hover,
+        .source-comment a:active {
+            color: inherit;
+        }
+
+        .unlock-requirements {
+            color: #6b5b2a;
+            font-size: 0.85em;
+            margin-top: 8px;
+            padding: 6px;
+            background: #fff4cc;
+            border-left: 3px solid #d8b55b;
+            border-radius: 2px;
+        }
+
+        .ref-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .ref-label {
+            font-size: 0.85em;
+            color: #6d6559;
+            font-weight: 600;
+        }
+
+        .ref-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(159, 151, 139, 0.18);
+            border: 1px solid rgba(159, 151, 139, 0.35);
+            color: #5b534a;
+            font-size: 0.85em;
+            text-decoration: none;
+        }
+
+        .ref-link:hover {
+            background: rgba(159, 151, 139, 0.3);
+        }
+
+        .ref-link.ref-link-text {
+            cursor: default;
+        }
+
+        .description i {
+            font-style: italic;
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .description-row {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .description-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .target-button-column {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: flex-start;
+        }
+
+        .target-button {
+            border: 1px solid #b5b5b5;
+            background: #f0f0f0;
+            color: #444;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.8em;
+            cursor: pointer;
+            min-width: 80px;
+            transition: background 0.15s, border-color 0.15s, transform 0.15s;
+        }
+
+        .target-button:hover {
+            background: #e0e0e0;
+            border-color: #999;
+            transform: translateY(-1px);
+        }
+
+        .target-button.upgraded {
+            background: #e6f1ff;
+            border-color: #7fbcff;
+            color: #1f4c8f;
+        }
+
+        .target-button.upgraded:hover {
+            background: #d7e8ff;
+        }
+
+        .hash-target {
+            outline: 2px solid #d8b55b;
+            outline-offset: -2px;
+            background: rgba(255, 244, 204, 0.35);
+        }
+
+        .img-placeholder {
+            display: inline-block;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            color: #e67e22;
+            font-weight: 600;
+            cursor: help;
+        }
+
+        .img-placeholder:hover {
+            background: #e67e22;
+            color: white;
+        }
+
+        .img-icon {
+            display: inline-block;
+            height: 1em;
+            width: auto;
+            object-fit: contain;
+            vertical-align: -0.2em;
+            margin: 0 2px;
+        }
+
+        .img-icon-shield {
+            width: auto;
+            height: 1em;
+            object-fit: contain;
+        }
+
+        .formula-icon {
+            width: 1.2em;
+            height: 1.2em;
+            vertical-align: -0.28em;
+            margin: 0 4px 0 2px;
+        }
+
+        .img-icon-stat {
+            filter: brightness(0) saturate(100%);
+        }
+
+        .img-icon-stat.img-icon-no-filter {
+            filter: none;
+        }
+
+        .description-upgraded {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #ddd;
+        }
+
+        .ability-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 3px 8px;
+            font-size: 0.8em;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        .tag.pool-tag {
+            cursor: pointer;
+        }
+
+        .tag.pool-tag:hover {
+            background: #e6e6e6;
+            border-color: #cfcfcf;
+        }
+
+        .tag-icon {
+            width: 14px;
+            height: 14px;
+            display: inline-block;
+        }
+
+        .no-results {
+            padding: 40px;
+            text-align: center;
+            color: #999;
+            font-size: 1.1em;
+        }
+
+        .no-results code {
+            background: #f5f5f5;
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+        }
+
+        code {
+            background: #e8e8e8;
+            border-radius: 3px;
+            padding: 2px 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        .floating-buttons {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 1200;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .formula-button-float {
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            z-index: 1200;
+        }
+
+        .announcement-button,
+        .formula-button {
+            background: #9f978b;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+        }
+
+        .announcement-button:hover,
+        .formula-button:hover {
+            background: #7f776b;
+        }
+
+        .formula-button {
+            background: #6d6559;
+        }
+
+        .announcement-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1300;
+            align-items: center;
+            justify-content: center;
+            padding: calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left));
+        }
+
+        .formula-panel {
+            display: none;
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            z-index: 1200;
+            max-width: 380px;
+        }
+
+        .formula-panel .announcement-card {
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .announcement-card {
+            background: #fff;
+            max-width: 560px;
+            width: 100%;
+            max-height: calc(100vh - 40px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+            border-radius: 10px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(159, 151, 139, 0.4);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .announcement-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: #f3f1ee;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .announcement-header h2 {
+            font-size: 1.1em;
+            color: #5b534a;
+        }
+
+        .announcement-close {
+            background: none;
+            border: none;
+            font-size: 1.4em;
+            color: #7f776b;
+            cursor: pointer;
+        }
+
+        .announcement-body {
+            padding: 18px 20px 10px;
+            color: #4b453d;
+            line-height: 1.6;
+            overflow-y: auto;
+        }
+
+        .announcement-body pre {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .announcement-body ul,
+        .announcement-body ol {
+            margin: 8px 0 8px 20px;
+            padding-left: 16px;
+            list-style-position: outside;
+        }
+
+        .announcement-body li {
+            margin: 4px 0;
+        }
+
+        .announcement-body ul ul,
+        .announcement-body ul ol,
+        .announcement-body ol ul,
+        .announcement-body ol ol {
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        .announcement-footer {
+            padding: 0 20px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .announcement-lang {
+            display: inline-flex;
+            gap: 8px;
+        }
+
+        .announcement-lang-btn {
+            background: #efece7;
+            border: 1px solid rgba(159, 151, 139, 0.4);
+            color: #5b534a;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.85em;
+            cursor: pointer;
+        }
+
+        .announcement-lang-btn.active {
+            background: #9f978b;
+            color: #fff;
+            border-color: #9f978b;
+        }
+
+        .no-results p {
+            margin: 15px 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90vh;
+            margin-top: 5%;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: white;
+            font-size: 2em;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .modal-close:hover {
+            color: #ddd;
+        }
+
+        .target-modal-card {
+            background: #fff;
+            padding: 24px;
+            border-radius: 6px;
+            max-width: 640px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            margin: 5% auto;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .target-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .target-modal-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .target-modal-body {
+            background: #f5f5f5;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .target-visualizer {
+            margin-bottom: 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            background: #fafafa;
+        }
+
+        .target-visualizer-summary {
+            font-size: 0.9em;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .target-variable-controls {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px dashed #d8d8d8;
+            border-radius: 6px;
+            background: #fff;
+        }
+
+        .target-variable-heading {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #444;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .target-variable-hint {
+            font-weight: 400;
+            color: #777;
+        }
+
+        .target-variable-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85em;
+            color: #333;
+        }
+
+        .target-variable-group input[type="range"] {
+            flex: 1;
+        }
+
+        .target-variable-label {
+            min-width: 70px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .target-variable-value {
+            min-width: 24px;
+            text-align: right;
+            font-weight: 600;
+            color: #222;
+        }
+
+        .target-visualizer-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        .target-visualizer-controls span {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .target-visualizer-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .target-visualizer-buttons button {
+            border: 1px solid #c5c5c5;
+            background: #fff;
+            color: #444;
+            border-radius: 999px;
+            padding: 4px 12px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+        }
+
+        .target-visualizer-buttons button:hover {
+            background: #f0f0f0;
+            border-color: #999;
+            transform: translateY(-1px);
+        }
+
+        .target-visualizer-error {
+            font-size: 0.9em;
+            color: #c0392b;
+            margin-bottom: 8px;
+            display: none;
+        }
+
+        .target-visualizer-warning {
+            font-size: 0.85em;
+            color: #7a4a00;
+            background: #fff3d6;
+            border: 1px solid #f1c17d;
+            border-radius: 6px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
+            display: none;
+        }
+
+        .target-grid-wrapper {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+
+        .target-grid {
+            display: grid;
+            grid-template-columns: repeat(15, 22px);
+            gap: 4px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 6px;
+            border: 1px solid #e3e3e3;
+        }
+
+        .target-cell {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: #fdfdfd;
+            cursor: pointer;
+            transition: background 0.1s ease, border-color 0.1s ease, transform 0.1s ease;
+        }
+
+        .target-cell.origin {
+            border-color: #ffa84a;
+            background: #ffffff;
+            cursor: default;
+        }
+
+        .target-cell-in-range {
+            background: rgba(74, 108, 247, 0.15);
+            border-color: rgba(74, 108, 247, 0.4);
+        }
+
+        .target-cell.origin.target-cell-in-range {
+            background: #fff6e9;
+            border-color: #ffa84a;
+        }
+
+        .target-cell-target {
+            position: relative;
+            z-index: 1;
+            border-color: #2742a3;
+            background: rgba(74, 108, 247, 0.5);
+            color: #fff;
+        }
+
+        .target-cell-target::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 6px;
+            border: 2px solid #2742a3;
+            pointer-events: none;
+        }
+
+        .target-cell-selected {
+            position: relative;
+            z-index: 1;
+            border-color: #2742a3;
+        }
+
+        .target-cell-selected::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 6px;
+            border: 2px solid #2742a3;
+            pointer-events: none;
+        }
+
+        .target-cell.origin.target-cell-target {
+            background: rgba(255, 168, 74, 0.55);
+            border-color: #f08d28;
+            color: #5f2f00;
+        }
+
+        .target-cell.origin.target-cell-target::after {
+            border-color: #f08d28;
+        }
+
+        .target-cell-aoe {
+            background: rgba(245, 166, 35, 0.85);
+            border-color: #c77b09;
+        }
+
+        .target-cell.origin.target-cell-aoe {
+            background: rgba(245, 166, 35, 0.85);
+            border-color: #c77b09;
+        }
+
+        .target-cell-target.target-cell-aoe::after {
+            border-color: #c77b09;
+        }
+
+        .target-cell-blocked {
+            position: relative;
+        }
+
+        .target-cell-blocked::after {
+            content: '';
+            position: absolute;
+            inset: 5px;
+            background: #111111;
+            border: 1px solid #050505;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+            pointer-events: none;
+        }
+
+        .target-grid-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        .target-grid-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .target-legend-swatch {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            border: 1px solid #d1d1d1;
+        }
+
+        .target-legend-swatch.range {
+            background: rgba(74, 108, 247, 0.25);
+        }
+
+        .target-legend-swatch.aoe {
+            background: rgba(245, 166, 35, 0.85);
+        }
+
+        .target-code-line {
+            display: block;
+        }
+
+        .target-code-line.error {
+            background: #ffeaea;
+            color: #c0392b;
+        }
+
+        .target-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #888;
+            line-height: 1;
+        }
+
+        .target-modal-close:hover {
+            color: #333;
+        }
+
+        .footer {
+            padding: 20px;
+            background: #f5f5f5;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+
+            th,
+            td {
+                padding: 8px;
+                font-size: 0.9em;
+            }
+
+            .description {
+                max-width: 150px;
+                font-size: 0.85em;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .icon-part {
+                transform: translateY(-15px) scale(0.7);
+            }
+
+            .controls input {
+                min-width: auto;
+            }
+
+            .navbar {
+                justify-content: flex-start;
+                overflow-x: auto;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .controls label {
+                font-size: 0.95em;
+                color: #666;
+            }
+
+            .language-toggle {
+                top: 40px;
+                right: 12px;
+                left: auto;
+                transform: none;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="floating-buttons">
+        <button class="announcement-button" id="announcementButton" type="button">Announcement</button>
+    </div>
+    <div class="formula-button-float">
+        <button class="formula-button" id="formulaButton" type="button">Formula explanation</button>
+    </div>
+    <div class="announcement-modal" id="announcementModal">
+        <div class="announcement-card" role="dialog" aria-modal="true" aria-labelledby="announcementTitle">
+            <div class="announcement-header">
+                <h2 id="announcementTitle">Announcement</h2>
+                <button class="announcement-close" id="announcementClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="announcement-body" id="announcementBody"></div>
+            <div class="announcement-footer">
+                <div class="announcement-lang" role="group" aria-label="Language">
+                    <button type="button" class="announcement-lang-btn" id="announcementLangEn"
+                        data-lang="en">English</button>
+                    <button type="button" class="announcement-lang-btn" id="announcementLangZh"
+                        data-lang="zh">中文</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="formula-panel" id="formulaModal">
+        <div class="announcement-card" role="dialog" aria-labelledby="formulaTitle">
+            <div class="announcement-header">
+                <h2 id="formulaTitle">Formula explanation</h2>
+                <button class="announcement-close" id="formulaClose" type="button" aria-label="Close">×</button>
+            </div>
+            <div class="announcement-body" id="formulaBody"></div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="language-toggle" role="group" aria-label="Language">
+            <button type="button" class="lang-link" id="langButtonEn" data-lang="en">English</button>
+            <span class="lang-separator">/</span>
+            <button type="button" class="lang-link" id="langButtonZh" data-lang="zh">中文</button>
+        </div>
+        <div class="header-image-wrap">
+            <img src="header.jpg" alt="Mewgenics header" class="header-image">
+        </div>
+        <div id="navbarMount"></div>
+        <div class="header">
+            <h1 id="headerTitle">Mewgenics Encyclopedia</h1>
+            <p id="headerSubtitle">Ability Viewer</p>
+        </div>
+
+        <div class="controls">
+            <div class="search-wrapper">
+                <input type="text" id="searchInput" placeholder="Search by ability name or description...">
+                <button class="clear-button" id="clearButton" title="Clear search">×</button>
+            </div>
+            <select id="classFilter">
+                <option value="">All Classes</option>
+            </select>
+        </div>
+
+        <div class="visibility-controls">
+            <label for="showHiddenToggle">
+                <input type="checkbox" id="showHiddenToggle">
+                <span id="showHiddenLabel">Show Hidden</span>
+            </label>
+            <div class="visibility-note" id="visibilityNote"></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label" id="totalLabel">Total Abilities:</span>
+                <span class="stat-value" id="totalCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label" id="showingLabel">Showing:</span>
+                <span class="stat-value" id="showingCount">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label" id="poolFilterLabel">Pool:</span>
+                <select id="poolFilter" class="stats-select">
+                    <option value="">Select Pool</option>
+                </select>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label" id="showFilePoolsLabel">Show file pools:</span>
+                <input type="checkbox" id="showFilePoolsToggle">
+            </div>
+            <div class="stats-note" id="statsRangeNote">Range feature is WIP; the damage value shown at the left could
+                be imprecise, further finetuning is needed.</div>
+        </div>
+
+        <div id="pagerTop"></div>
+
+        <div class="table-wrapper">
+            <table id="abilitiesTable">
+                <thead>
+                    <tr>
+                        <th id="iconHeader" style="width: 160px;">
+                            <div class="icon-header">
+                                <span id="iconHeaderText">Icon</span>
+                            </div>
+                        </th>
+                        <th id="nameHeader" style="width: 150px;">Ability Name</th>
+                        <th id="descHeader">Description</th>
+                        <th id="poolHeader" style="width: 180px;">Pools</th>
+                        <th id="classHeader" class="sortable" style="width: 100px;" onclick="sortBy('class')">Class<span
+                                class="sort-indicator"></span></th>
+                        <th id="frameHeader" style="width: 80px;" hidden>Frame</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="6" class="no-results" id="loadingMessage">Loading abilities...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="pagerBottom"></div>
+
+        <div class="footer">
+            <p id="footerSource">Free fan site with data from game ability definitions and sprite mappings.</p>
+            <p id="footerCredit">Original game by Edmund McMillen and Tyler Glaiel.</p>
+            <p id="footerAuthor">Created by: Bilibili@Alriph</p>
+            <p id="footerTools">Tools used: mewgpaks, JPEXS FFDec</p>
+        </div>
+    </div>
+
+    <div id="imageModal" class="modal">
+        <span class="modal-close" onclick="closeModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <div id="targetModal" class="modal">
+        <div class="target-modal-card">
+            <div class="target-modal-header">
+                <div class="target-modal-title" id="targetModalTitle"></div>
+                <button type="button" class="target-modal-close" onclick="closeTargetModal()">&times;</button>
+            </div>
+            <div class="target-visualizer" id="targetVisualizer">
+                <div class="target-visualizer-summary" id="targetVisualizerSummary"></div>
+                <div class="target-variable-controls" id="targetVariableControls"></div>
+                <div class="target-visualizer-controls">
+                    <span id="targetObstaclesHint">Click tiles to toggle obstacles.</span>
+                    <div class="target-visualizer-buttons">
+                        <button type="button" id="targetAddObstaclesBtn">Add Sample Obstacles</button>
+                        <button type="button" id="targetClearObstaclesBtn">Clear Obstacles</button>
+                    </div>
+                </div>
+                <div class="target-visualizer-warning" id="targetVisualizerWarning"></div>
+                <div class="target-visualizer-error" id="targetVisualizerError"></div>
+                <div class="target-grid-wrapper">
+                    <div class="target-grid" id="targetGrid"></div>
+                    <div class="target-grid-legend">
+                        <div class="target-grid-legend-item">
+                            <span class="target-legend-swatch range"></span>
+                            <span id="targetLegendRangeText"></span>
+                        </div>
+                        <div class="target-grid-legend-item">
+                            <span class="target-legend-swatch aoe"></span>
+                            <span id="targetLegendSplashText"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <pre class="target-modal-body" id="targetModalBody"></pre>
+        </div>
+    </div>
+
+    <script src="js/codex-utils.js"></script>
+    <script src="js/codex-i18n.js"></script>
+    <script src="js/codex-components.js"></script>
+    <script>
+        renderNavbar('navbarMount', 'abilities');
+        renderPager('pagerTop');
+        renderPager('pagerBottom', 'Bottom');
+    </script>
+    <script src="js/target-renderer.js"></script>
+    <script src="announcement.js"></script>
+    <script>
+        let allAbilities = [];
+        let filteredAbilities = [];
+        let currentLanguage = initLanguage('en');
+        window.currentLanguage = currentLanguage;
+        let currentSort = { column: null, direction: 'asc' };
+        let currentPage = 1;
+        let pageSize = 50;
+        let currentDisplayAbilities = [];
+        let hashPromoteKey = null;
+        let hashPromoteActive = false;
+        let editorNotes = {};
+        let refIndex = new Map();
+        let targetRenderer;
+        let showFilePools = false;
+        const showDetailedValues = true;
+        const ANNOUNCEMENT_SEEN_KEY = 'codexAnnouncementSeen_v1';
+
+        if (typeof window.fetchJsonWithFallback !== 'function') {
+            window.fetchJsonWithFallback = async function (url, label) {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return await response.json();
+            };
+        }
+
+        function setLanguage(lang) {
+            codexSetLanguage(lang, () => {
+                currentLanguage = window.currentLanguage;
+                applyUiLanguage();
+                updateHashPromotion('ability');
+                filterAbilities(true);
+                scrollToHash('ability');
+            });
+        }
+
+        const UI_TEXT = mergeUiText(COMMON_UI_TEXT, {
+            en: {
+                pageTitle: 'Ability Viewer | Mewgenics Encyclopedia',
+                headerTitle: 'Mewgenics Encyclopedia',
+                headerSubtitle: 'Ability Viewer',
+                searchPlaceholder: 'Search by ability name or description...',
+                showDetailed: 'Show detailed values',
+                hideDetailed: 'Hide detailed values',
+                otherNoClass: 'Other (No Class)',
+                allClasses: 'All Classes',
+                totalAbilities: 'Total Abilities:',
+                showing: 'Showing:',
+                showFilePoolsLabel: 'Show file names:',
+                pagePrev: 'Prev',
+                pageNext: 'Next',
+                pageSize: 'Per page',
+                pageAll: 'All',
+                poolFilterLabel: 'Pool:',
+                selectPool: 'Select Pool',
+                statsRangeNote: 'Range feature is WIP; the damage value shown at the left could be imprecise, further finetuning is needed.',
+                sourceCommentsLabel: 'Source Comments:',
+                editorNotesLabel: 'Editor Notes:',
+                unlockRequirementsLabel: 'Unlock Requirements:',
+                referencesLabel: 'References:',
+                relatedItemsLabel: 'Related items:',
+                iconHeader: 'Icon',
+                nameHeader: 'Ability Name',
+                descHeader: 'Description',
+                poolHeader: 'Pools',
+                classHeader: 'Class',
+                frameHeader: 'Frame',
+                loading: 'Loading abilities...',
+                noResults: 'No abilities found matching your filters.',
+                errorLoading: 'Error loading abilities:',
+                solution: 'Solution:',
+                runServer: 'Run the server script to browse the abilities:',
+                thenOpen: 'Then open:',
+                footerSource: 'Free fan site with data from game ability definitions and sprite mappings.',
+                formulaButton: 'Formula explanation',
+                formulaTitle: 'Formula explanation',
+                formulaBody: '<ul><li>bonus_melee_damage = str-5</li><li>bonus_melee_ability_damage = (str-5)/2</li><li>bonus_ranged_damage = (dex-5)/2</li><li>bonus_basic_spell_damage = unknown, most of the time 0</li><li>clamp(x, a, b) = min(max(x, a), b)</li><li>Multiplication and division are rounded towards 0.</li></ul>',
+                formula: 'Formula',
+                manaCost: 'Mana Cost',
+                rangeButtonLabel: 'Range',
+                rangeButtonUpgradeLabel: 'Range+',
+                rangeModalTitle: 'Target Profile',
+                rangeModalTitleUpgraded: 'Target Profile (Upgraded)',
+                targetModalEmpty: 'No target settings available.',
+                targetLegendRange: 'Reachable tiles',
+                targetLegendSplash: 'Target tiles',
+                targetSummaryDefault: 'Range preview ready.',
+                targetSummaryUnavailable: 'Range preview unavailable.',
+                targetSummaryMode: 'Mode',
+                targetSummaryRange: 'Range',
+                targetSummarySplash: 'Splash',
+                targetSummaryRequiresLine: 'Needs clear line',
+                targetSummaryLineLength: 'Line length',
+                targetSummaryDiagonalOnly: 'Diagonal only',
+                targetSummaryOrthOnly: 'Orthogonal only',
+                targetSummaryTile: 'Tile',
+                targetSummaryDirection: 'Direction',
+                targetSummaryDirection8: 'Eight-way direction',
+                targetSummarySelf: 'Self-cast',
+                targetRenderUnsupported: 'Unsupported target_mode',
+                targetRenderMissingMode: 'Missing target_mode',
+                targetRenderParseError: 'Could not parse target line.',
+                targetRenderErrorPrefix: 'Unable to render:',
+                targetRenderWarningPrefix: 'Warning: renderer may not support:',
+                targetRenderStraightshotUnsupported: 'straightshot_attack template',
+                targetObstaclesHint: 'Click tiles to add or remove blockers, then preview line-of-sight abilities.',
+                targetAddObstacles: 'Add sample obstacles',
+                targetClearObstacles: 'Clear obstacles',
+                targetVariablesHeading: 'Variables',
+                targetVariablesHint: 'Adjust placeholders (default 0).',
+                targetVariableBonusMeleeRange: 'Reach',
+                targetVariableBonusRange: 'Range',
+            },
+            zh: {
+                pageTitle: '能力图鉴 | Mewgenics 百科',
+                headerTitle: 'Mewgenics 百科',
+                headerSubtitle: '能力图鉴',
+                searchPlaceholder: '按能力名称或描述搜索...',
+                showDetailed: '显示详细数值',
+                hideDetailed: '隐藏详细数值',
+                otherNoClass: '其他（无职业）',
+                allClasses: '全部职业',
+                totalAbilities: '能力总数：',
+                showing: '显示：',
+                showFilePoolsLabel: '显示文件名称：',
+                pagePrev: '上一页',
+                pageNext: '下一页',
+                pageSize: '每页',
+                pageAll: '全部',
+                poolFilterLabel: '池：',
+                selectPool: '选择池',
+                statsRangeNote: '射程功能仍在开发中；左侧显示的伤害数值可能不够精确，仍需进一步微调。',
+                sourceCommentsLabel: '源码注释：',
+                editorNotesLabel: '编辑注释：',
+                unlockRequirementsLabel: '解锁条件：',
+                referencesLabel: '引用：',
+                relatedItemsLabel: '相关物品：',
+                iconHeader: '图标',
+                nameHeader: '能力名称',
+                descHeader: '描述',
+                poolHeader: '池',
+                classHeader: '职业',
+                frameHeader: '帧',
+                loading: '正在加载能力...',
+                noResults: '没有找到符合筛选条件的能力。',
+                errorLoading: '加载能力失败：',
+                solution: '解决方法：',
+                runServer: '运行本地服务器脚本以浏览能力：',
+                thenOpen: '然后打开：',
+                footerSource: '这是一个免费同人站点，数据来自游戏能力定义与精灵映射。',
+                formulaButton: '公式说明',
+                formulaTitle: '公式说明',
+                formulaBody: '<ul><li>bonus_melee_damage = str-5</li><li>bonus_melee_ability_damage = (str-5)/2</li><li>bonus_ranged_damage = (dex-5)/2</li><li>bonus_basic_spell_damage = 未知，多数情况下为 0</li><li>clamp(x, a, b) = min(max(x, a), b)</li><li>乘法和除法结果向零取整。</li></ul>',
+                formula: '公式',
+                manaCost: '法力值消耗',
+                rangeButtonLabel: '射程',
+                rangeButtonUpgradeLabel: '射程+',
+                rangeModalTitle: '目标信息',
+                rangeModalTitleUpgraded: '目标信息（升级）',
+                targetModalEmpty: '无目标设定。',
+                targetLegendRange: '可选格',
+                targetLegendSplash: '目标格',
+                targetSummaryDefault: '射程预览就绪。',
+                targetSummaryUnavailable: '无法提供射程预览。',
+                targetSummaryMode: '模式',
+                targetSummaryRange: '范围',
+                targetSummarySplash: '溅射',
+                targetSummaryRequiresLine: '需要直线视线',
+                targetSummaryLineLength: '射线长度',
+                targetSummaryDiagonalOnly: '仅对角线',
+                targetSummaryOrthOnly: '仅直线方向',
+                targetSummaryTile: '格子',
+                targetSummaryDirection: '定向',
+                targetSummaryDirection8: '八向定向',
+                targetSummarySelf: '自我施放',
+                targetRenderUnsupported: '不支持的 target_mode',
+                targetRenderMissingMode: '缺少 target_mode',
+                targetRenderParseError: '无法解析该目标行。',
+                targetRenderErrorPrefix: '无法渲染：',
+                targetRenderWarningPrefix: '警告：渲染器可能不支持：',
+                targetRenderStraightshotUnsupported: 'straightshot_attack 模板',
+                targetObstaclesHint: '点击格子设置/清除障碍，用于测试视线。',
+                targetAddObstacles: '添加示例障碍',
+                targetClearObstacles: '清除障碍',
+                targetVariablesHeading: '变量',
+                targetVariablesHint: '调整占位符（默认为 0）。',
+                targetVariableBonusMeleeRange: '延伸',
+                targetVariableBonusRange: '射程',
+            }
+        });
+
+        const CLASS_LABELS = {
+            en: {
+                fighter: 'Fighter',
+                thief: 'Thief',
+                tank: 'Tank',
+                mage: 'Mage',
+                medic: 'Medic',
+                hunter: 'Hunter',
+                necromancer: 'Necromancer',
+                butcher: 'Butcher',
+                monk: 'Monk',
+                druid: 'Druid',
+                psychic: 'Psychic',
+                tinkerer: 'Tinkerer',
+                jester: 'Jester',
+                colorless: 'Collarless',
+            },
+            zh: {
+                fighter: '战士',
+                thief: '盗贼',
+                tank: '坦克',
+                mage: '法师',
+                medic: '牧师',
+                hunter: '猎人',
+                necromancer: '死灵法师',
+                butcher: '屠夫',
+                monk: '武僧',
+                druid: '德鲁伊',
+                psychic: '灵能者',
+                tinkerer: '工匠',
+                jester: '小丑',
+                colorless: '无项圈',
+            }
+        };
+
+        const POOL_LABELS = {
+            en: {
+                BasicAttackPool: 'Default/Basic Attack',
+                CatAbilityPool: 'Default',
+                CatGenAbilityPool: 'Default/Generated Ability',
+                ColorlessAbilities: 'Default/Collarless Ability',
+            },
+            zh: {
+                BasicAttackPool: '默认/基础攻击',
+                CatAbilityPool: '默认',
+                CatGenAbilityPool: '默认/生成能力',
+                ColorlessAbilities: '默认/无项圈能力',
+            }
+        };
+
+        const POOL_TYPE_LABELS = {
+            en: {
+                ability_pool: 'Ability Pool',
+                attack_pool: 'Attack Pool',
+            },
+            zh: {
+                ability_pool: '能力池',
+                attack_pool: '攻击池',
+            }
+        };
+
+        const GROUP_LABELS = {
+            en: {
+                attack: 'Attack',
+                defense: 'Defense',
+                move: 'Move',
+                misc: 'Misc',
+            },
+            zh: {
+                attack: '攻击',
+                defense: '防御',
+                move: '移动',
+                misc: '其他',
+            }
+        };
+
+        const t = createTranslator(UI_TEXT);
+
+
+        function applyUiLanguage() {
+            document.title = t('pageTitle');
+            document.getElementById('headerTitle').textContent = t('headerTitle');
+            document.getElementById('headerSubtitle').textContent = t('headerSubtitle');
+            document.getElementById('searchInput').placeholder = t('searchPlaceholder');
+            document.getElementById('navAbilities').textContent = t('navAbilities');
+            document.getElementById('navPassives').textContent = t('navPassives');
+            document.getElementById('navItems').textContent = t('navItems');
+            document.getElementById('navWeather').textContent = t('navWeather');
+            document.getElementById('navKeywords').textContent = t('navKeywords');
+            document.getElementById('navFurniture').textContent = t('navFurniture');
+            document.getElementById('navMutations').textContent = t('navMutations');
+            const navEvents = document.getElementById('navEvents');
+            if (navEvents) {
+                navEvents.textContent = t('navEvents');
+            }
+            document.getElementById('navAchievements').textContent = t('navAchievements');
+            document.getElementById('navCharacters').textContent = t('navCharacters');
+            document.getElementById('navItemSet').textContent = t('navItemSet');
+            const navMisc = document.getElementById('navMisc');
+            if (navMisc) {
+                const navMiscLabel = navMisc.querySelector('.nav-dropdown-label');
+                if (navMiscLabel) {
+                    navMiscLabel.textContent = t('navMisc');
+                } else {
+                    navMisc.textContent = t('navMisc');
+                }
+            }
+            document.getElementById('langButtonEn').textContent = t('languageEnglish');
+            document.getElementById('langButtonZh').textContent = t('languageChinese');
+            document.getElementById('showHiddenLabel').textContent = t('showHidden');
+            document.getElementById('showFilePoolsLabel').textContent = t('showFilePoolsLabel');
+            document.getElementById('totalLabel').textContent = t('totalAbilities');
+            document.getElementById('showingLabel').textContent = t('showing');
+            document.getElementById('pagePrev').textContent = t('pagePrev');
+            document.getElementById('pageNext').textContent = t('pageNext');
+            document.getElementById('pageSizeLabel').textContent = t('pageSize');
+            document.getElementById('pageSizeAll').textContent = t('pageAll');
+            document.getElementById('pagePrevBottom').textContent = t('pagePrev');
+            document.getElementById('pageNextBottom').textContent = t('pageNext');
+            document.getElementById('pageSizeLabelBottom').textContent = t('pageSize');
+            document.getElementById('pageSizeAllBottom').textContent = t('pageAll');
+            const poolFilterLabel = document.getElementById('poolFilterLabel');
+            if (poolFilterLabel) {
+                poolFilterLabel.textContent = t('poolFilterLabel');
+            }
+            const statsRangeNote = document.getElementById('statsRangeNote');
+            if (statsRangeNote) {
+                statsRangeNote.textContent = t('statsRangeNote');
+            }
+            const iconHeaderText = document.getElementById('iconHeaderText');
+            if (iconHeaderText) {
+                iconHeaderText.textContent = t('iconHeader');
+            }
+            document.getElementById('nameHeader').textContent = t('nameHeader');
+            document.getElementById('descHeader').textContent = t('descHeader');
+            document.getElementById('poolHeader').textContent = t('poolHeader');
+            const classHeader = document.getElementById('classHeader');
+            classHeader.innerHTML = t('classHeader') + '<span class="sort-indicator"></span>';
+            document.getElementById('frameHeader').textContent = t('frameHeader');
+            document.getElementById('footerSource').textContent = t('footerSource');
+            document.getElementById('footerCredit').textContent = t('footerCredit');
+            document.getElementById('footerAuthor').textContent = t('footerAuthor');
+            document.getElementById('footerTools').textContent = t('footerTools');
+            document.getElementById('announcementButton').textContent = t('announcementButton');
+            document.getElementById('announcementTitle').textContent = t('announcementTitle');
+            document.getElementById('announcementLangEn').textContent = t('languageEnglish');
+            document.getElementById('announcementLangZh').textContent = t('languageChinese');
+            const formulaButton = document.getElementById('formulaButton');
+            if (formulaButton) {
+                formulaButton.textContent = t('formulaButton');
+            }
+            const formulaTitle = document.getElementById('formulaTitle');
+            if (formulaTitle) {
+                formulaTitle.textContent = t('formulaTitle');
+            }
+            const formulaBody = document.getElementById('formulaBody');
+            if (formulaBody) {
+                formulaBody.innerHTML = withAttributeIconsHtml(t('formulaBody'));
+            }
+            const visibilityNote = document.getElementById('visibilityNote');
+            if (visibilityNote) {
+                visibilityNote.textContent = '';
+                visibilityNote.style.display = 'none';
+            }
+            updateAnnouncementLanguageButtons();
+            loadAnnouncementContent();
+
+            updateNavbarLinks();
+            const classFilter = document.getElementById('classFilter');
+            const selectedClass = classFilter ? classFilter.value : '';
+            populateClassFilter(selectedClass);
+            const poolFilter = document.getElementById('poolFilter');
+            const selectedPool = poolFilter ? poolFilter.value : '';
+            populatePoolFilter(selectedPool);
+
+            const loadingMessage = document.getElementById('loadingMessage');
+            if (loadingMessage) {
+                loadingMessage.textContent = t('loading');
+            }
+
+            document.getElementById('langButtonEn').classList.toggle('active', currentLanguage === 'en');
+            document.getElementById('langButtonZh').classList.toggle('active', currentLanguage === 'zh');
+
+            if (targetRenderer && typeof targetRenderer.refreshCopy === 'function') {
+                targetRenderer.refreshCopy();
+            }
+        }
+
+        // Load abilities from JSON
+        async function loadAbilities() {
+            try {
+                const [data, notesData, refsData] = await Promise.all([
+                    fetchJsonWithFallback('abilities_combined.json', 'abilities'),
+                    fetchJsonWithFallback('editor_notes.json', 'editor notes').catch(() => ({})),
+                    fetchJsonWithFallback('refs_index.json', 'refs index').catch(() => null)
+                ]);
+                editorNotes = notesData || {};
+                if (refsData) {
+                    buildRefIndex(refsData);
+                } else {
+                    refIndex = new Map();
+                }
+                allAbilities = data.abilities;
+                filteredAbilities = allAbilities;
+
+                document.getElementById('totalCount').textContent = allAbilities.length;
+                applyUiLanguage();
+                updateHashPromotion('ability');
+                filterAbilities(true);
+            } catch (error) {
+                console.error('Error loading abilities:', error);
+                const errorMsg = `
+                    <tr><td colspan="6" class="no-results">
+                        <p style="margin-bottom: 10px;"><strong>${escapeHtml(t('errorLoading'))}</strong> ${escapeHtml(error.message)}</p>
+                        <p style="font-size: 0.9em; color: #666; line-height: 1.5;">
+                            <strong>${escapeHtml(t('solution'))}</strong><br>
+                            ${escapeHtml(t('runServer'))}<br>
+                            <code style="background: #f5f5f5; padding: 5px 10px; border-radius: 3px; display: inline-block;">python serve.py</code><br>
+                            <br>
+                            ${escapeHtml(t('thenOpen'))} <code style="background: #f5f5f5; padding: 5px 10px; border-radius: 3px; display: inline-block;">http://localhost:8000/abilities_viewer.html</code>
+                        </p>
+                    </td></tr>
+                `;
+                document.getElementById('tableBody').innerHTML = errorMsg;
+            }
+        }
+
+        // Populate class filter dropdown
+        function populateClassFilter(selectedValue = '') {
+            const allClasses = allAbilities.map(a => a.ability_class);
+            const classes = [...new Set(allClasses.filter(c => c))].sort();
+            const hasNull = allClasses.some(c => !c || c === null || c === undefined);
+
+            const select = document.getElementById('classFilter');
+            if (!select) {
+                return;
+            }
+            select.innerHTML = '';
+
+            const allOption = document.createElement('option');
+            allOption.value = '';
+            allOption.textContent = t('allClasses');
+            select.appendChild(allOption);
+
+            classes.forEach(cls => {
+                const option = document.createElement('option');
+                option.value = cls;
+                option.textContent = getClassLabel(cls);
+                select.appendChild(option);
+            });
+
+            // Add "Other" option if there are entries without a class
+            if (hasNull) {
+                const otherOption = document.createElement('option');
+                otherOption.value = '__null__';
+                otherOption.textContent = t('otherNoClass');
+                select.appendChild(otherOption);
+            }
+
+            select.value = selectedValue;
+        }
+
+
+        function getClassLabel(className) {
+            if (!className) {
+                return '';
+            }
+            const key = className.toLowerCase();
+            return CLASS_LABELS[currentLanguage]?.[key] || CLASS_LABELS.en[key] || className;
+        }
+
+        function localizePoolTag(tag) {
+            if (!tag) {
+                return '';
+            }
+            const direct = POOL_LABELS[currentLanguage]?.[tag] || POOL_LABELS.en[tag];
+            if (direct) {
+                return direct;
+            }
+            const parts = String(tag).split('.');
+            if (parts.length < 2) {
+                return tag;
+            }
+            const className = parts[0];
+            const section = parts[1];
+            if (section === 'ability_groups' && parts[2]) {
+                const group = parts[2];
+                const groupLabel = GROUP_LABELS[currentLanguage]?.[group]
+                    || GROUP_LABELS.en[group]
+                    || group;
+                return `${getClassLabel(className)}/${groupLabel}`;
+            }
+            if (section === 'ability_pool') {
+                return getClassLabel(className);
+            }
+            if (section === 'attack_pool') {
+                const basicAttack = currentLanguage === 'zh' ? '基础攻击' : 'Basic Attack';
+                return `${getClassLabel(className)}/${basicAttack}`;
+            }
+            return tag;
+        }
+
+        function isFilePoolTag(tag) {
+            return String(tag || '').startsWith('file:');
+        }
+
+        function populatePoolFilter(selectedValue = '') {
+            const poolTags = new Map();
+            allAbilities.forEach(ability => {
+                const tags = Array.isArray(ability.ability_pools)
+                    ? ability.ability_pools
+                    : [];
+                tags.forEach(tag => {
+                    if (!showFilePools && isFilePoolTag(tag)) {
+                        return;
+                    }
+                    if (!poolTags.has(tag)) {
+                        poolTags.set(tag, localizePoolTag(tag));
+                    }
+                });
+            });
+
+            const select = document.getElementById('poolFilter');
+            if (!select) {
+                return;
+            }
+            select.innerHTML = '';
+
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = t('selectPool');
+            select.appendChild(placeholder);
+
+            const sorted = Array.from(poolTags.entries())
+                .map(([tag, label]) => ({ tag, label }))
+                .sort((a, b) => a.label.localeCompare(b.label, currentLanguage));
+
+            sorted.forEach(({ tag, label }) => {
+                const option = document.createElement('option');
+                option.value = tag;
+                option.textContent = label || tag;
+                select.appendChild(option);
+            });
+
+            select.value = selectedValue;
+        }
+
+        function handlePoolSelection() {
+            const select = document.getElementById('poolFilter');
+            if (!select) {
+                return;
+            }
+            const selected = select.value;
+            if (!selected) {
+                return;
+            }
+            searchByPool(selected);
+            select.value = '';
+        }
+
+        function parseHashQuery(raw) {
+            if (!raw || !raw.startsWith('#')) {
+                return '';
+            }
+            const trimmed = raw.slice(1).trim();
+            if (trimmed.startsWith('(')) {
+                const end = trimmed.indexOf(')');
+                if (end > 1) {
+                    return trimmed.slice(1, end).trim();
+                }
+                return '';
+            }
+            return trimmed;
+        }
+
+        function searchByPool(tag) {
+            const searchInput = document.getElementById('searchInput');
+            const localizedTag = localizePoolTag(tag);
+            searchInput.value = `#(${localizedTag}) `;
+            searchInput.focus();
+            updateClearButtonVisibility();
+            filterAbilities();
+        }
+
+        function getEditorNote(code) {
+            if (!code || !editorNotes || typeof editorNotes !== 'object') {
+                return '';
+            }
+            const note = editorNotes[code];
+            if (!note || typeof note !== 'object') {
+                return '';
+            }
+            return note[currentLanguage] || note.en || '';
+        }
+
+        function getChapterName(requirement) {
+            if (!requirement || typeof requirement !== 'object') {
+                return '';
+            }
+            const localized = getLocalizedText(requirement.chapter_name_texts, '');
+            if (localized) {
+                return localized;
+            }
+            if (requirement.chapter_name_literal) {
+                return requirement.chapter_name_literal;
+            }
+            return requirement.chapter || '';
+        }
+
+        function buildUnlockRequirementsHtml(requirements) {
+            if (!Array.isArray(requirements) || requirements.length === 0) {
+                return '';
+            }
+            const lines = requirements
+                .map(requirement => {
+                    const chapterName = getChapterName(requirement);
+                    const classLabel = requirement.class
+                        ? getClassLabel(requirement.class)
+                        : (requirement.class || '');
+                    if (chapterName && classLabel) {
+                        return `${chapterName} (${classLabel})`;
+                    }
+                    return chapterName || classLabel || '';
+                })
+                .filter(line => line && line.trim() !== '');
+
+            if (lines.length === 0) {
+                return '';
+            }
+
+            const linesHtml = lines.map(line => escapeHtml(line)).join('<br>');
+            return `<div class="unlock-requirements">${escapeHtml(t('unlockRequirementsLabel'))} ${linesHtml}</div>`;
+        }
+
+        function buildRefIndex(data) {
+            const map = new Map();
+            const refs = Array.isArray(data?.refs) ? data.refs : [];
+            refs.forEach(entry => {
+                if (entry?.reverse) {
+                    return;
+                }
+                const ref = entry?.ref || {};
+                if (!ref.type || !ref.code) {
+                    return;
+                }
+                map.set(`${ref.type}:${ref.code}`, entry);
+            });
+            refIndex = map;
+        }
+
+        function getRefLabel(ref) {
+            if (!ref || !ref.type || !ref.code) {
+                return '';
+            }
+            const entry = refIndex.get(`${ref.type}:${ref.code}`);
+            const text = entry?.text || {};
+            return text[currentLanguage] || text.en || ref.code || '';
+        }
+
+        function getRefLink(ref) {
+            if (!ref || !ref.type || !ref.code) {
+                return '';
+            }
+            if (ref.type === 'achievement' || ref.type === 'item_pool') {
+                return '';
+            }
+            const lang = currentLanguage !== 'en' ? `?lang=${currentLanguage}` : '';
+            const code = encodeURIComponent(ref.code);
+            if (ref.type === 'ability') {
+                return `index.html${lang}#${code}`;
+            }
+            if (ref.type === 'passive') {
+                return `passives.html${lang}#${code}`;
+            }
+            if (ref.type === 'item') {
+                return `items.html${lang}#${code}`;
+            }
+            if (ref.type === 'mutation') {
+                return `mutations.html${lang}#${code}`;
+            }
+            if (ref.type === 'event') {
+                return `events.html${lang}#${code}`;
+            }
+            return '';
+        }
+
+        function buildRefsHtml(refs) {
+            if (!Array.isArray(refs) || refs.length === 0) {
+                return '';
+            }
+            const unique = new Map();
+            refs.forEach(ref => {
+                if (!ref || !ref.type || !ref.code) {
+                    return;
+                }
+                const key = `${ref.type}:${ref.code}`;
+                unique.set(key, ref);
+            });
+            const refList = Array.from(unique.values()).map(ref => ({
+                ref,
+                label: getRefLabel(ref) || ref.code
+            }));
+            const labelCounts = new Map();
+            refList.forEach(({ label }) => {
+                labelCounts.set(label, (labelCounts.get(label) || 0) + 1);
+            });
+            const links = refList.map(({ ref, label }) => {
+                const display = labelCounts.get(label) > 1
+                    ? `${label} (${ref.code})`
+                    : label;
+                const href = getRefLink(ref);
+                if (href) {
+                    return `<a href="${href}">${escapeHtml(display)}</a>`;
+                }
+                return `<span>${escapeHtml(display)}</span>`;
+            });
+            if (!links.length) {
+                return '';
+            }
+            return `<div class="source-comment">${escapeHtml(t('referencesLabel'))} ${links.join(' ')}</div>`;
+        }
+
+        function getBackrefs(ref, filterType) {
+            if (!ref || !ref.type || !ref.code) {
+                return [];
+            }
+            const entry = refIndex.get(`${ref.type}:${ref.code}`);
+            const backrefs = Array.isArray(entry?.backrefs) ? entry.backrefs : [];
+            if (!filterType) {
+                return backrefs;
+            }
+            return backrefs.filter(backref => backref?.type === filterType);
+        }
+
+        function buildBackrefsHtml(ref, filterType, label) {
+            const backrefs = getBackrefs(ref, filterType);
+            if (!backrefs.length) {
+                return '';
+            }
+            const backrefList = backrefs.map(backref => ({
+                backref,
+                label: getRefLabel(backref) || backref.code
+            }));
+            const labelCounts = new Map();
+            backrefList.forEach(({ label }) => {
+                labelCounts.set(label, (labelCounts.get(label) || 0) + 1);
+            });
+            const links = backrefList.map(({ backref, label }) => {
+                const display = labelCounts.get(label) > 1
+                    ? `${label} (${backref.code})`
+                    : label;
+                const href = getRefLink(backref);
+                if (href) {
+                    return `<a href="${href}">${escapeHtml(display)}</a>`;
+                }
+                return `<span>${escapeHtml(display)}</span>`;
+            });
+            return `<div class="source-comment">${escapeHtml(label)} ${links.join(' ')}</div>`;
+        }
+
+        function mergeRefs(...refsLists) {
+            const merged = new Map();
+            refsLists.forEach(list => {
+                if (!Array.isArray(list)) {
+                    return;
+                }
+                list.forEach(ref => {
+                    if (!ref || !ref.type || !ref.code) {
+                        return;
+                    }
+                    const key = `${ref.type}:${ref.code}`;
+                    merged.set(key, ref);
+                });
+            });
+            return Array.from(merged.values());
+        }
+
+        function hasRenderedText(texts, fallback) {
+            if (typeof fallback === 'string' && fallback.trim() !== '') {
+                return true;
+            }
+            if (!texts || typeof texts !== 'object') {
+                return false;
+            }
+            return Object.values(texts).some(value => typeof value === 'string' && value.trim() !== '');
+        }
+
+        function makeRowId(prefix, code) {
+            if (!code) {
+                return '';
+            }
+            const safe = String(code).replace(/[^A-Za-z0-9_-]+/g, '-');
+            return `${prefix}-${safe}`;
+        }
+
+        function getHashKey(prefix) {
+            const hash = window.location.hash ? window.location.hash.slice(1) : '';
+            if (!hash) {
+                return '';
+            }
+            const decoded = decodeURIComponent(hash);
+            const prefixToken = `${prefix}-`;
+            if (decoded.startsWith(prefixToken)) {
+                return decoded.slice(prefixToken.length);
+            }
+            return decoded;
+        }
+
+        function updateHashPromotion(prefix) {
+            const key = getHashKey(prefix);
+            if (key) {
+                hashPromoteKey = key;
+                hashPromoteActive = true;
+            }
+        }
+
+        function clearHashPromotion() {
+            hashPromoteKey = null;
+            hashPromoteActive = false;
+        }
+
+        function scrollToHash(prefix) {
+            const hash = window.location.hash ? window.location.hash.slice(1) : '';
+            if (!hash) {
+                return;
+            }
+            const decoded = decodeURIComponent(hash);
+            const direct = document.getElementById(decoded);
+            const rowId = makeRowId(prefix, decoded);
+            const target = direct || (rowId ? document.getElementById(rowId) : null);
+            if (!target) {
+                return;
+            }
+            target.classList.add('hash-target');
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => target.classList.remove('hash-target'), 2000);
+        }
+
+        // Display abilities in table
+        function displayAbilities(abilities) {
+            const tbody = document.getElementById('tableBody');
+            const showHidden = document.getElementById('showHiddenToggle')?.checked;
+            const visibleAbilities = abilities.filter(ability => {
+                const sourceFile = ability.source_file || '';
+                const defaultHiddenFiles = [
+                    'armor_abilities.gon',
+                    'consumable_item_abilities.gon',
+                    'contextual_abilities.gon',
+                    'disorder_abilities.gon',
+                    'event_abilities.gon',
+                    'finalboss_abilities.gon',
+                    'guillotina_abilities.gon',
+                    'item_abilities.gon',
+                    'kaiju_abilities.gon',
+                    'misc_abilities.gon',
+                    'rifthead_abilities.gon',
+                    'special_enemy_abilities.gon',
+                    'terminator_abilities.gon',
+                    'test_abilities.gon',
+                    'throbbing_king_abilities.gon',
+                    'util_abilities.gon'
+                ];
+                const isDefaultHidden = defaultHiddenFiles.some(hiddenFile => sourceFile.endsWith(hiddenFile));
+                if (!showHidden && isDefaultHidden) {
+                    return false;
+                }
+                const hasIcon = ability.frame_number !== null && ability.frame_number !== undefined;
+                const hasTitle = hasRenderedText(ability.ability_name_texts, ability.ability_name);
+                const hasDescription = hasRenderedText(ability.description_texts, ability.description) ||
+                    hasRenderedText(ability.description2_texts, ability.description_2);
+                return showHidden || (hasIcon && hasTitle && hasDescription);
+            });
+            let orderedAbilities = visibleAbilities;
+            if (hashPromoteActive && hashPromoteKey) {
+                const targetIndex = visibleAbilities.findIndex(ability => (ability.ability_code || '') === hashPromoteKey);
+                if (targetIndex > 0) {
+                    const target = visibleAbilities[targetIndex];
+                    orderedAbilities = [
+                        target,
+                        ...visibleAbilities.slice(0, targetIndex),
+                        ...visibleAbilities.slice(targetIndex + 1)
+                    ];
+                }
+            }
+
+            currentDisplayAbilities = orderedAbilities;
+            const totalEntries = orderedAbilities.length;
+            const size = pageSize <= 0 ? totalEntries : pageSize;
+            const pageCount = totalEntries > 0 ? Math.ceil(totalEntries / size) : 1;
+            if (currentPage > pageCount) {
+                currentPage = pageCount;
+            }
+            if (currentPage < 1) {
+                currentPage = 1;
+            }
+            const startIndex = size === 0 ? 0 : (currentPage - 1) * size;
+            const pageEntries = size === 0
+                ? orderedAbilities
+                : orderedAbilities.slice(startIndex, startIndex + size);
+
+            if (totalEntries === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="no-results">${escapeHtml(t('noResults'))}</td></tr>`;
+                document.getElementById('showingCount').textContent = '0';
+                document.getElementById('pageInfo').textContent = '0 / 0';
+                document.getElementById('pageInfoBottom').textContent = '0 / 0';
+                document.getElementById('pagePrev').disabled = true;
+                document.getElementById('pageNext').disabled = true;
+                document.getElementById('pagePrevBottom').disabled = true;
+                document.getElementById('pageNextBottom').disabled = true;
+                return;
+            }
+
+            tbody.innerHTML = pageEntries.map(ability => {
+                const localizedName = getLocalizedText(ability.ability_name_texts, ability.ability_name);
+                const baseName = localizedName || ability.ability_name || ability.ability_code || '';
+                const displayName = baseName;
+                const localizedUpgradedName = getLocalizedText(
+                    ability.ability_name_texts_upgraded,
+                    ability.ability_name_upgraded
+                );
+                const upgradedNameRaw = (localizedUpgradedName && localizedUpgradedName !== ability.ability_code_upgraded)
+                    ? localizedUpgradedName
+                    : '';
+                const codeNameHint = ability.ability_code && ability.ability_code !== baseName
+                    ? ability.ability_code
+                    : '';
+                const nameTitle = codeNameHint ? `Code: ${codeNameHint}` : '';
+                const upgradedCodeHint = ability.ability_code_upgraded && ability.ability_code_upgraded !== upgradedNameRaw
+                    ? ability.ability_code_upgraded
+                    : '';
+                const upgradedNameTitle = upgradedCodeHint ? `Code: ${upgradedCodeHint}` : '';
+                const hasUpgrade = !!(
+                    upgradedNameRaw ||
+                    hasRenderedText(ability.description2_texts, ability.description_2) ||
+                    ability.cost_upgraded ||
+                    ability.damage_upgraded ||
+                    ability.cast_again_upgraded ||
+                    ability.icon_damage_display_upgraded ||
+                    ability.tags_rendered_upgraded ||
+                    ability.elements_upgraded ||
+                    ability.target_text_upgraded ||
+                    ability.is_dash_attack_upgraded
+                );
+                const upgradedNameFinal = hasUpgrade
+                    ? ((upgradedNameRaw || baseName) === baseName
+                        ? `${upgradedNameRaw || baseName}+`
+                        : (upgradedNameRaw || baseName))
+                    : '';
+                const localizedDescription = getLocalizedText(ability.description_texts, ability.description);
+                const localizedDescription2 = getLocalizedText(ability.description2_texts, ability.description_2);
+                const classLabel = ability.ability_class ? getClassLabel(ability.ability_class) : '';
+                const editorNoteText = getEditorNote(ability.ability_code);
+                const buildStatsHtml = (cost, damage, targetText, castAgainValue, iconDamageDisplay, iconDamageDisplaySuffix, isUpgraded) => {
+                    const rawDamageValue = damage?.value;
+                    const rawHealValue = damage?.heal_value;
+                    const manaValue = cost?.mana !== null && cost?.mana !== undefined ? cost.mana : null;
+                    const damageType = damage?.type || 'physical';
+
+                    const parseMultihitTimes = (text) => {
+                        if (!text) {
+                            return null;
+                        }
+                        const rawText = String(text);
+                        const multihitMatch = rawText.match(/\bmultihit\s+([^\s]+)/);
+                        if (multihitMatch) {
+                            const value = multihitMatch[1];
+                            return { value, isRange: false, isFormula: !isPureNumber(value) };
+                        }
+                        const minMatch = rawText.match(/\bmultihit_min\s+([^\s]+)/);
+                        const maxMatch = rawText.match(/\bmultihit_max\s+([^\s]+)/);
+                        const minValue = minMatch ? minMatch[1] : null;
+                        const maxValue = maxMatch ? maxMatch[1] : null;
+                        if (minValue && maxValue) {
+                            if (minValue === maxValue) {
+                                return { value: minValue, isRange: false, isFormula: !isPureNumber(minValue) };
+                            }
+                            return { value: `${minValue}~${maxValue}`, isRange: true, isFormula: false };
+                        }
+                        if (minValue) {
+                            return { value: minValue, isRange: false, isFormula: !isPureNumber(minValue) };
+                        }
+                        if (maxValue) {
+                            return { value: maxValue, isRange: false, isFormula: !isPureNumber(maxValue) };
+                        }
+                        return null;
+                    };
+
+                    const isPureNumber = (rawValue) => {
+                        if (rawValue === null || rawValue === undefined) {
+                            return false;
+                        }
+                        const text = String(rawValue).trim();
+                        return text !== '' && !isNaN(text);
+                    };
+
+                    const isSingleAttribute = (rawValue) => {
+                        if (typeof rawValue !== 'string') {
+                            return false;
+                        }
+                        return ['str', 'dex', 'con', 'int', 'spd', 'lck', 'cha']
+                            .includes(rawValue.trim().toLowerCase());
+                    };
+
+                    const isRangeValue = (rawValue) => {
+                        if (typeof rawValue !== 'string') {
+                            return false;
+                        }
+                        return /^\d+\s*-\s*\d+$/.test(rawValue.trim());
+                    };
+
+                    const isZeroValue = (rawValue) => {
+                        if (rawValue === null || rawValue === undefined) {
+                            return false;
+                        }
+                        const text = String(rawValue).trim();
+                        if (text === '' || isNaN(text)) {
+                            return false;
+                        }
+                        return Number(text) === 0;
+                    };
+
+                    const formatIconDisplayValue = (value) => {
+                        if (value === null || value === undefined) {
+                            return value;
+                        }
+                        return String(value).replace(/-/g, '~');
+                    };
+
+                    const addOneToCastAgain = (rawValue) => {
+                        if (rawValue === null || rawValue === undefined) {
+                            return null;
+                        }
+                        const text = String(rawValue).trim();
+                        if (text === '') {
+                            return null;
+                        }
+                        if (isPureNumber(text)) {
+                            return String(Number(text) + 1);
+                        }
+                        const rangeMatch = text.match(/^(\d+)\s*-\s*(\d+)$/);
+                        if (rangeMatch) {
+                            const minValue = Number(rangeMatch[1]) + 1;
+                            const maxValue = Number(rangeMatch[2]) + 1;
+                            return `${minValue}-${maxValue}`;
+                        }
+                        const leadMatch = text.match(/^(\d+)\s*([+-])\s*(.+)$/);
+                        if (leadMatch) {
+                            const baseValue = Number(leadMatch[1]) + 1;
+                            return `${baseValue}${leadMatch[2]}${leadMatch[3].trim()}`;
+                        }
+                        const tailMatch = text.match(/^(.+?)\s*\+\s*(\d+)$/);
+                        if (tailMatch) {
+                            const baseValue = Number(tailMatch[2]) + 1;
+                            return `${tailMatch[1].trim()}+${baseValue}`;
+                        }
+                        return `1+${text}`;
+                    };
+
+                    const parseCastAgainTimes = (rawValue) => {
+                        if (!rawValue && rawValue !== 0) {
+                            return null;
+                        }
+                        const totalValue = addOneToCastAgain(rawValue);
+                        if (!totalValue) {
+                            return null;
+                        }
+                        const isRange = isRangeValue(totalValue);
+                        const isFormula = !isPureNumber(totalValue) && !isRange;
+                        return { value: totalValue, isRange, isFormula };
+                    };
+
+                    const parseIconDamageSuffixTimes = (rawValue) => {
+                        if (!rawValue) {
+                            return null;
+                        }
+                        const match = String(rawValue).trim().match(/^x(\d+)$/i);
+                        if (!match) {
+                            return null;
+                        }
+                        return { value: match[1], isRange: false, isFormula: false };
+                    };
+
+                    const shouldHideDamage = isZeroValue(rawDamageValue);
+                    const shouldHideHeal = isZeroValue(rawHealValue);
+                    const damageValue = shouldHideDamage
+                        ? { value: null, display: null, pretty: null }
+                        : formatStatValue(rawDamageValue);
+                    const healValue = shouldHideHeal
+                        ? { value: null, display: null, pretty: null }
+                        : formatStatValue(rawHealValue);
+
+                    // Determine if value should be treated as a formula.
+                    const isFormulaValue = (rawValue) => {
+                        if (rawValue === null || rawValue === undefined || rawValue === '') {
+                            return false;
+                        }
+                        if (!isNaN(rawValue)) {
+                            return false;
+                        }
+                        if (typeof rawValue === 'string' && /^\d+\s*-\s*\d+$/.test(rawValue.trim())) {
+                            return false;
+                        }
+                        if (typeof rawValue === 'string' && rawValue.length <= 3) {
+                            return false;
+                        }
+                        return true;
+                    };
+
+                    const damageIsFormula = isFormulaValue(damageValue.value);
+                    const healIsFormula = isFormulaValue(healValue.value);
+                    const manaIsFormula = isFormulaValue(manaValue);
+                    const manaDisplay = manaValue !== null ? manaValue : null;
+                    const iconDamageDisplayText = iconDamageDisplay !== null && iconDamageDisplay !== undefined
+                        ? String(iconDamageDisplay).trim()
+                        : '';
+
+                    let statsHtml = `<div class="ability-stats${isUpgraded ? ' upgraded' : ''} detailed">`;
+
+                    const addDetailedLine = (icon, alt, value, isFormula, title) => {
+                        statsHtml += `<div class="stat-line"${title ? ` title="${escapeHtml(title)}"` : ''}>`;
+                        statsHtml += `<img src="res/${icon}.png" alt="${alt}" class="stat-icon" onerror="this.style.display='none'">`;
+                        const detailValue = isFormula ? withAttributeIcons(String(value)) : escapeHtml(String(value));
+                        statsHtml += `<div class="stat-value detailed${isFormula ? ' formula' : ''}">${detailValue}</div>`;
+                        statsHtml += '</div>';
+                    };
+
+                    const hasDamage = damageValue.display || healValue.display;
+                    if (hasDamage) {
+                        const isHeal = !!healValue.display && !damageValue.display;
+                        const typeIcon = isHeal ? 'heal' : (damageType || 'physical');
+                        const rawValue = damageValue.value || healValue.value;
+                        const prettyValue = damageValue.pretty || healValue.pretty || rawValue;
+                        const isIconDamageDisplay = iconDamageDisplayText
+                            && rawValue !== null
+                            && rawValue !== undefined
+                            && String(rawValue).trim() === iconDamageDisplayText;
+                        const rawDisplayValue = isIconDamageDisplay
+                            ? formatIconDisplayValue(rawValue)
+                            : rawValue;
+                        const prettyDisplayValue = isIconDamageDisplay
+                            ? formatIconDisplayValue(prettyValue)
+                            : prettyValue;
+                        const multihitTimes = parseMultihitTimes(targetText);
+                        const castAgainTimes = multihitTimes
+                            ? null
+                            : parseCastAgainTimes(castAgainValue);
+                        const suffixTimes = (multihitTimes || castAgainTimes)
+                            ? null
+                            : parseIconDamageSuffixTimes(iconDamageDisplaySuffix);
+                        const timesInfo = multihitTimes || castAgainTimes || suffixTimes;
+                        if (timesInfo && rawValue !== null && rawValue !== undefined) {
+                            const valueText = String(rawDisplayValue);
+                            const valueNeedsBrackets = !(isPureNumber(valueText) || isSingleAttribute(valueText));
+                            const valueDisplay = valueNeedsBrackets ? `[${valueText}]` : valueText;
+                            const timesDisplay = timesInfo.isRange || timesInfo.isFormula
+                                ? `[${timesInfo.value}]`
+                                : String(timesInfo.value);
+                            const combinedValue = `${valueDisplay}x${timesDisplay}`;
+                            addDetailedLine(
+                                typeIcon,
+                                typeIcon,
+                                combinedValue,
+                                damageIsFormula || healIsFormula || valueNeedsBrackets || timesInfo.isRange || timesInfo.isFormula,
+                                combinedValue
+                            );
+                        } else {
+                            const valueDisplay = prettyDisplayValue;
+                            addDetailedLine(
+                                typeIcon,
+                                typeIcon,
+                                valueDisplay,
+                                damageIsFormula || healIsFormula,
+                                valueDisplay
+                            );
+                        }
+                    }
+                    if (manaDisplay !== null) {
+                        const manaValueDisplay = manaDisplay;
+                        addDetailedLine(
+                            'cost',
+                            'mana',
+                            manaValueDisplay,
+                            manaIsFormula,
+                            t('manaCost')
+                        );
+                    }
+
+                    statsHtml += '</div>';
+                    const hasMana = manaDisplay !== null;
+                    return (hasDamage || hasMana) ? statsHtml : '';
+                };
+
+                const normalizeCost = (upgradedCost, baseCost) => {
+                    if (!upgradedCost) {
+                        return baseCost;
+                    }
+                    const hasValue = ['move_points', 'act_points', 'mana'].some(
+                        key => upgradedCost[key] !== null && upgradedCost[key] !== undefined
+                    );
+                    return hasValue ? upgradedCost : baseCost;
+                };
+
+                const normalizeCastAgain = (upgradedCastAgain, baseCastAgain) => {
+                    if (upgradedCastAgain === null || upgradedCastAgain === undefined || upgradedCastAgain === '') {
+                        return baseCastAgain;
+                    }
+                    return upgradedCastAgain;
+                };
+
+                const normalizeIconDamageDisplay = (upgradedDisplay, baseDisplay) => {
+                    if (upgradedDisplay === null || upgradedDisplay === undefined || upgradedDisplay === '') {
+                        return baseDisplay;
+                    }
+                    return upgradedDisplay;
+                };
+
+                const normalizeIconDamageDisplaySuffix = (upgradedSuffix, baseSuffix) => {
+                    if (upgradedSuffix === null || upgradedSuffix === undefined || upgradedSuffix === '') {
+                        return baseSuffix;
+                    }
+                    return upgradedSuffix;
+                };
+
+                const normalizeNullable = (value) => (value === undefined ? null : value);
+
+                const areValuesEqual = (left, right) => normalizeNullable(left) === normalizeNullable(right);
+
+                const areDamageValuesEqual = (left, right) => {
+                    if (!left && !right) {
+                        return true;
+                    }
+                    if (!left || !right) {
+                        return false;
+                    }
+                    return areValuesEqual(left.value, right.value)
+                        && areValuesEqual(left.heal_value, right.heal_value)
+                        && areValuesEqual(left.type, right.type);
+                };
+
+                // Build base stats only
+                let baseStatsHtml = buildStatsHtml(
+                    ability.cost,
+                    ability.damage,
+                    ability.target_text,
+                    ability.cast_again,
+                    ability.icon_damage_display,
+                    ability.icon_damage_display_suffix,
+                    false
+                );
+
+                // Build upgraded stats only (if they exist)
+                let upgradedStatsHtml = '';
+                if (ability.cost_upgraded || ability.damage_upgraded || ability.cast_again_upgraded || ability.icon_damage_display_upgraded || ability.icon_damage_display_suffix_upgraded) {
+                    const upgradedCost = normalizeCost(ability.cost_upgraded, ability.cost);
+                    const upgradedDamage = ability.damage_upgraded || ability.damage;
+                    const upgradedHasDamage = upgradedDamage && (upgradedDamage.value || upgradedDamage.heal_value);
+                    const damageForDisplay = upgradedHasDamage ? upgradedDamage : ability.damage;
+                    const upgradedCastAgain = normalizeCastAgain(
+                        ability.cast_again_upgraded,
+                        ability.cast_again
+                    );
+                    const upgradedIconDamageDisplay = normalizeIconDamageDisplay(
+                        ability.icon_damage_display_upgraded,
+                        ability.icon_damage_display
+                    );
+                    const upgradedIconDamageDisplaySuffix = normalizeIconDamageDisplaySuffix(
+                        ability.icon_damage_display_suffix_upgraded,
+                        ability.icon_damage_display_suffix
+                    );
+                    const manaChanged = !areValuesEqual(ability.cost?.mana, upgradedCost?.mana);
+                    const damageChanged = !areDamageValuesEqual(upgradedDamage, ability.damage);
+                    const castAgainChanged = !areValuesEqual(upgradedCastAgain, ability.cast_again);
+                    const iconDisplayChanged = !areValuesEqual(upgradedIconDamageDisplay, ability.icon_damage_display);
+                    const iconSuffixChanged = !areValuesEqual(
+                        upgradedIconDamageDisplaySuffix,
+                        ability.icon_damage_display_suffix
+                    );
+                    const shouldShowUpgradedStats = manaChanged || damageChanged || castAgainChanged || iconDisplayChanged || iconSuffixChanged;
+
+                    if (shouldShowUpgradedStats) {
+                        const upgradedTargetText = ability.target_text_upgraded || ability.target_text;
+                        upgradedStatsHtml = buildStatsHtml(
+                            upgradedCost,
+                            damageForDisplay,
+                            upgradedTargetText,
+                            upgradedCastAgain,
+                            upgradedIconDamageDisplay,
+                            upgradedIconDamageDisplaySuffix,
+                            true
+                        );
+                    }
+                }
+
+                // Build rendered tags display (small icons above icon)
+                const buildRenderedTagsHtml = (tagsRendered) => {
+                    if (!tagsRendered || tagsRendered.length === 0) return '';
+
+                    const tagMap = {
+                        'musical': 'res/music.png',
+                        'holy': 'res/tags/holy.png',
+                        'water': 'res/tags/water.png',
+                        'fire': 'res/tags/fire.png',
+                        'electric': 'res/tags/electric.png',
+                        'ice': 'res/tags/ice.png',
+                        'explosion': 'res/tags/explosion.png',
+                        'grass': 'res/tags/grass.png',
+                        'wind': 'res/tags/wind.png',
+                        'gravity': 'res/tags/gravity.png',
+                        'shadow': 'res/tags/shadow.png',
+                        'earth': 'res/tags/earth.png',
+                    };
+
+                    return tagsRendered.map(tag => {
+                        const lowerTag = tag.toLowerCase();
+                        const iconPath = tagMap[lowerTag];
+                        if (iconPath) {
+                            return `<img src="${iconPath}" alt="${tag}" class="tag-icon-small" title="${escapeHtml(tag)}">`;
+                        }
+                        return '';
+                    }).filter(x => x).join('');
+                };
+
+                let tagsRenderedHtml = buildRenderedTagsHtml(ability.tags_rendered);
+                let tagsRenderedUpgradedHtml = '';
+                let showUpgradedIcon = false;
+
+                if (ability.tags_rendered_upgraded && ability.tags_rendered !== ability.tags_rendered_upgraded) {
+                    tagsRenderedUpgradedHtml = buildRenderedTagsHtml(ability.tags_rendered_upgraded);
+                    showUpgradedIcon = true;
+                }
+
+                const normalizeTypeIcon = (value) => {
+                    const normalized = String(value || 'melee').toLowerCase();
+                    if (normalized === 'attack') {
+                        return 'melee';
+                    }
+                    return normalized;
+                };
+
+                const baseTypeIcon = normalizeTypeIcon(ability.type_icon);
+                const upgradedTypeIcon = normalizeTypeIcon(
+                    ability.type_icon_upgraded || baseTypeIcon
+                );
+
+                const buildTypeIconHtml = (typeIcon) => `
+                    <img src="abilitytype/${typeIcon}.png" alt="${escapeHtml(typeIcon)}" class="ability-type-icon" onerror="this.onerror=null;this.src='abilitytype/unknown.png';">
+                `;
+
+                const classBackgrounds = {
+                    fighter: '#de9494',
+                    thief: '#fffbb5',
+                    tank: '#857348',
+                    mage: '#a6a6c9',
+                    medic: '#e2e2e2',
+                    hunter: '#425d3d',
+                    necromancer: '#131313',
+                    butcher: '#ac4457',
+                    monk: '#787878',
+                    druid: '#5b4237',
+                    psychic: '#645379',
+                    tinkerer: '#6bdfbe',
+                    jester: 'linear-gradient(135deg, #a66d6d 0%, #93bec6 50%, #a2c476 100%)',
+                    colorless: '#c1c1c1',
+                    other: '#ffffff'
+                };
+
+                const abilityClassKey = ability.ability_class
+                    ? String(ability.ability_class).toLowerCase()
+                    : null;
+                const iconBackground = abilityClassKey
+                    ? classBackgrounds[abilityClassKey]
+                    : null;
+                const iconPartStyle = iconBackground
+                    ? ` style="--icon-bg: ${iconBackground};"`
+                    : '';
+
+                // Build icon sections: base icon with base stats, optionally upgraded icon with upgraded stats
+                let baseIconHtml = `
+                    <div class="icon-column">
+                        <div class="icon-row">
+                            <div class="icon-part"${iconPartStyle}>
+                                <div class="tags-line">${tagsRenderedHtml}</div>
+                                <div class="ability-icon-stack">
+                                    ${buildTypeIconHtml(baseTypeIcon)}
+                                    ${ability.frame_number !== null && ability.frame_number !== undefined ?
+                        `<img src="AbilityIcon/${ability.frame_number}.png" 
+                                            alt="${escapeHtml(displayName)}"
+                                            title="${escapeHtml(nameTitle)}"
+                                            class="ability-icon"
+                                            onerror="this.style.display='none'"
+                                            onclick="openModal(this.src, '${escapeHtml(displayName)}')">`
+                        : '<div class="ability-icon-placeholder" title="No frame mapping available"></div>'
+                    }
+                                </div>
+                            </div>
+                            <div class="stats-stack">
+                                ${baseStatsHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                let upgradedIconHtml = '';
+                // If upgraded tags differ, show separator and upgraded icon with upgraded stats only
+                if (showUpgradedIcon) {
+                    upgradedIconHtml = `
+                    <div class="icon-column upgraded">
+                        <div class="icon-row">
+                            <div class="icon-part"${iconPartStyle}>
+                                <div class="tags-line upgraded">${tagsRenderedUpgradedHtml}</div>
+                                <div class="ability-icon-stack">
+                                    ${buildTypeIconHtml(upgradedTypeIcon)}
+                                    ${ability.frame_number !== null && ability.frame_number !== undefined ?
+                            `<img src="AbilityIcon/${ability.frame_number}.png" 
+                                            alt="${escapeHtml(displayName)}"
+                                            title="${escapeHtml(nameTitle)}"
+                                            class="ability-icon"
+                                            onerror="this.style.display='none'"
+                                            onclick="openModal(this.src, '${escapeHtml(displayName)}')">`
+                            : '<div class="ability-icon-placeholder" title="No frame mapping available"></div>'
+                        }
+                                </div>
+                            </div>
+                            <div class="stats-stack">
+                                ${upgradedStatsHtml}
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                } else if (upgradedStatsHtml) {
+                    // If upgraded stats exist but tags are the same, show them in a single icon row with separator
+                    baseIconHtml = `
+                    <div class="icon-column">
+                        <div class="icon-row">
+                            <div class="icon-part"${iconPartStyle}>
+                                <div class="tags-line">${tagsRenderedHtml}</div>
+                                <div class="ability-icon-stack">
+                                    ${buildTypeIconHtml(baseTypeIcon)}
+                                    ${ability.frame_number !== null && ability.frame_number !== undefined ?
+                            `<img src="AbilityIcon/${ability.frame_number}.png" 
+                                            alt="${escapeHtml(displayName)}"
+                                            title="${escapeHtml(nameTitle)}"
+                                            class="ability-icon"
+                                            onerror="this.style.display='none'"
+                                            onclick="openModal(this.src, '${escapeHtml(displayName)}')">`
+                            : '<div class="ability-icon-placeholder" title="No frame mapping available"></div>'
+                        }
+                                </div>
+                            </div>
+                            <div class="stats-stack">
+                                ${baseStatsHtml}${upgradedStatsHtml}
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }
+
+                const iconAndStatsContent = baseIconHtml + upgradedIconHtml;
+
+                const poolTags = Array.isArray(ability.ability_pools) ? ability.ability_pools : [];
+                const classesWithGroups = new Set(
+                    poolTags
+                        .map(tag => {
+                            const parts = String(tag).split('.');
+                            return parts[1] === 'ability_groups' ? parts[0] : null;
+                        })
+                        .filter(Boolean)
+                );
+                const filteredPoolTags = poolTags.filter(tag => {
+                    const parts = String(tag).split('.');
+                    if (!showFilePools && isFilePoolTag(tag)) {
+                        return false;
+                    }
+                    if (parts.length < 2) {
+                        return true;
+                    }
+                    if (parts[1] === 'ability_pool' && classesWithGroups.has(parts[0])) {
+                        return false;
+                    }
+                    return true;
+                });
+                const poolTagsHtml = filteredPoolTags.length
+                    ? `<div class="ability-tags">${filteredPoolTags.map(tag => {
+                        const tagArg = JSON.stringify(tag);
+                        return `<span class="tag pool-tag" onclick='searchByPool(${tagArg})'>${escapeHtml(localizePoolTag(tag))}</span>`;
+                    }).join('')}</div>`
+                    : '-';
+
+                const descriptionPieces = [
+                    `<div class="description">${parseRichText(localizedDescription || 'N/A')}</div>`
+                ];
+
+                const unlockRequirementsHtml = buildUnlockRequirementsHtml(
+                    ability.unlock_requirements
+                );
+                if (unlockRequirementsHtml) {
+                    descriptionPieces.push(unlockRequirementsHtml);
+                }
+
+                const refsHtml = buildRefsHtml(mergeRefs(ability.refs, ability.refs_upgraded));
+                if (refsHtml) {
+                    descriptionPieces.push(refsHtml);
+                }
+
+                const relatedItemsHtml = buildBackrefsHtml(
+                    { type: 'ability', code: ability.ability_code },
+                    'item',
+                    t('relatedItemsLabel')
+                );
+                if (relatedItemsHtml) {
+                    descriptionPieces.push(relatedItemsHtml);
+                }
+
+                if (ability.desc_notes) {
+                    descriptionPieces.push(`<div class="source-comment">${escapeHtml(t('sourceCommentsLabel'))} ${escapeHtml(ability.desc_notes)}</div>`);
+                }
+
+                if (editorNoteText) {
+                    descriptionPieces.push(`<div class="source-comment">${escapeHtml(t('editorNotesLabel'))} ${escapeHtml(editorNoteText)}</div>`);
+                }
+
+                if (localizedDescription2) {
+                    descriptionPieces.push(`<div class="description description-upgraded">${parseRichText(localizedDescription2)}</div>`);
+                }
+
+                if (localizedDescription2 && ability.desc2_notes) {
+                    descriptionPieces.push(`<div class="source-comment">${escapeHtml(t('sourceCommentsLabel'))} ${escapeHtml(ability.desc2_notes)}</div>`);
+                }
+
+                const modalAbilityName = displayName;
+                const modalNameArg = JSON.stringify(modalAbilityName);
+                const targetButtons = [];
+                const baseTargetPayload = ability.target_text ? JSON.stringify(ability.target_text) : null;
+                const upgradedTargetPayload = ability.target_text_upgraded
+                    ? JSON.stringify(ability.target_text_upgraded)
+                    : null;
+                const baseDashPayload = JSON.stringify(ability.is_dash_attack === true);
+                const upgradedDashPayload = JSON.stringify(
+                    ability.is_dash_attack_upgraded === true
+                        ? true
+                        : ability.is_dash_attack === true
+                );
+                const templateWarning = ability.template === 'straightshot_attack'
+                    ? t('targetRenderStraightshotUnsupported')
+                    : '';
+                const warningPayload = JSON.stringify(templateWarning);
+
+                if (baseTargetPayload) {
+                    targetButtons.push(`<button type="button" class="target-button" onclick='openTargetModal(${modalNameArg}, ${baseTargetPayload}, false, ${baseDashPayload}, ${warningPayload})'>${escapeHtml(t('rangeButtonLabel'))}</button>`);
+                }
+
+                if (upgradedTargetPayload) {
+                    targetButtons.push(`<button type="button" class="target-button upgraded" onclick='openTargetModal(${modalNameArg}, ${upgradedTargetPayload}, true, ${upgradedDashPayload}, ${warningPayload})'>${escapeHtml(t('rangeButtonUpgradeLabel'))}</button>`);
+                }
+
+                const targetButtonsHtml = targetButtons.length ? `<div class="target-button-column">${targetButtons.join('')}</div>` : '';
+                const descriptionColumnHtml = `
+                    <div class="description-row">
+                        ${targetButtonsHtml}
+                        <div class="description-stack">
+                            ${descriptionPieces.join('')}
+                        </div>
+                    </div>
+                `;
+
+                return `
+                    <tr id="${makeRowId('ability', ability.ability_code || '')}" data-code="${escapeHtml(ability.ability_code || '')}">
+                        <td class="image-cell">
+                            <div class="icon-and-stats">
+                                ${iconAndStatsContent}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="ability-name"${nameTitle ? ` title="${escapeHtml(nameTitle)}"` : ''}>${escapeHtml(displayName)}</div>
+                            ${upgradedNameFinal ? `<div class="ability-name ability-name-upgraded"${upgradedNameTitle ? ` title="${escapeHtml(upgradedNameTitle)}"` : ''}>${escapeHtml(upgradedNameFinal)}</div>` : ''}
+                        </td>
+                        <td>
+                            ${descriptionColumnHtml}
+                        </td>
+                        <td class="pool-cell">${poolTagsHtml}</td>
+                        <td class="class-cell">${classLabel ? `<div class="ability-class class-${ability.ability_class.toLowerCase()}">${escapeHtml(classLabel)}</div>` : '-'}</td>
+                        <td class="frame-cell" hidden>${ability.frame_number}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('showingCount').textContent = pageEntries.length;
+            document.getElementById('pageInfo').textContent = `${currentPage} / ${pageCount}`;
+            document.getElementById('pagePrev').disabled = currentPage <= 1;
+            document.getElementById('pageNext').disabled = currentPage >= pageCount;
+            document.getElementById('pageInfoBottom').textContent = `${currentPage} / ${pageCount}`;
+            document.getElementById('pagePrevBottom').disabled = currentPage <= 1;
+            document.getElementById('pageNextBottom').disabled = currentPage >= pageCount;
+            document.getElementById('pageSizeSelectBottom').value = String(pageSize);
+            requestAnimationFrame(() => scrollToHash('ability'));
+        }
+
+        function sortBy(column) {
+            clearHashPromotion();
+            // Toggle direction if clicking same column, otherwise default to ascending
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+
+            // Update sort indicators
+            document.querySelectorAll('thead th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            const headerMap = {
+                'class': 'classHeader'
+            };
+            const header = document.getElementById(headerMap[column]);
+            if (header) {
+                header.classList.add(`sort-${currentSort.direction}`);
+            }
+
+            // Sort filtered abilities
+            const sortedAbilities = [...filteredAbilities].sort((a, b) => {
+                let valueA, valueB;
+
+                if (column === 'class') {
+                    valueA = a.ability_class || '';
+                    valueB = b.ability_class || '';
+                }
+
+                if (valueA < valueB) return currentSort.direction === 'asc' ? -1 : 1;
+                if (valueA > valueB) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            currentPage = 1;
+            displayAbilities(sortedAbilities);
+        }
+
+        // Format stat values: if numeric, show as-is; if formula, show "?"
+        function formatStatValue(value) {
+            if (value === null || value === undefined) {
+                return { value: null, display: null, pretty: null };
+            }
+
+            if (typeof value === 'string') {
+                const trimmed = value.trim();
+                const lowered = trimmed.toLowerCase();
+                if (['str', 'dex', 'con', 'int', 'spd', 'lck', 'cha'].includes(lowered)) {
+                    return { value: trimmed, display: withAttributeIcons(lowered), pretty: trimmed };
+                }
+                if (/^\d+\s*-\s*\d+$/.test(trimmed)) {
+                    return { value: trimmed, display: trimmed, pretty: trimmed };
+                }
+            }
+
+            // Check if it's a number or numeric string
+            if (!isNaN(value) && value !== '') {
+                return { value: value, display: value, pretty: value };
+            }
+
+            // Short non-numeric values (e.g., "X") should be shown directly.
+            if (typeof value === 'string' && value.length <= 3) {
+                return { value: value, display: value, pretty: value };
+            }
+
+            // It's a formula or expression
+            const pretty = prettifyFormula(value);
+            return { value: value, display: '?', pretty: pretty };
+        }
+
+        function prettifyFormula(value) {
+            if (typeof value !== 'string') {
+                return value;
+            }
+            let text = value;
+            text = text.replace(/ceil\(X\/2\)/g, '(X+1)/2');
+            text = text.replace(/floor\(X\*\.25\)/g, 'X*0.25');
+            text = text.replace(/floor\(X\*0\.25\)/g, 'X*0.25');
+            text = text.replace(/(^|[^0-9])\.(\d)/g, '$10.$2');
+            return text;
+        }
+
+        // Parse rich text markup in descriptions
+        // Handles: [s:.7]text[/s] for italics, [img:xxx] for icons, newlines
+        function parseRichText(text) {
+            if (!text) return '';
+
+            // Escape HTML first
+            let html = escapeHtml(text);
+
+            // Handle [s:.7]...[/s] for italics (allow multiline content)
+            html = html.replace(/\[s:[^\]]+\]([\s\S]*?)\[\/s\]/g, '<i>$1</i>');
+
+            // Handle [b]...[/b] for bold (allow multiline content)
+            html = html.replace(/\[b\]([\s\S]*?)\[\/b\]/g, '<b>$1</b>');
+
+            // Handle [img:xxx] placeholders - use actual icon images
+            // Map icon names (handle "con" -> "constitution" for Windows reserved name)
+            // Shield icons (shield, divineshield) stay white; stat icons use CSS filter
+            html = html.replace(/\[img:([^\]]+)\]/g, function (match, iconName) {
+                const noFilterIcons = new Set(['health', 'movement', 'hp']);
+                const mappedName = mapFontIconName(iconName);
+                const isShield = iconName === 'shield' || iconName === 'divineshield';
+                const baseClass = isShield
+                    ? 'img-icon img-icon-shield'
+                    : 'img-icon img-icon-stat';
+                const className = noFilterIcons.has(mappedName)
+                    ? `${baseClass} img-icon-no-filter`
+                    : baseClass;
+
+                return `<img src="res/fonticon/${mappedName}.png" alt="${iconName}" title="${iconName}" class="${className}" onerror="this.style.display='none'">`;
+            });
+
+            // Handle backticks for inline code blocks
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+            // Handle newlines
+            html = html.replace(/\n/g, '<br>');
+
+            return html;
+        }
+
+        targetRenderer = createTargetRenderer();
+
+        function updateClearButtonVisibility() {
+            const clearButton = document.getElementById('clearButton');
+            const searchInput = document.getElementById('searchInput');
+            if (!clearButton || !searchInput) {
+                return;
+            }
+            clearButton.classList.toggle('visible', !!searchInput.value);
+        }
+
+        function clearSearch() {
+            const searchInput = document.getElementById('searchInput');
+            if (!searchInput) {
+                return;
+            }
+            searchInput.value = '';
+            updateClearButtonVisibility();
+            filterAbilities();
+        }
+
+        // Filter abilities
+        function filterAbilities(preserveHash = false) {
+            if (!preserveHash) {
+                clearHashPromotion();
+            }
+            updateClearButtonVisibility();
+            const showHiddenToggle = document.getElementById('showHiddenToggle');
+            const hashActive = hashPromoteActive && hashPromoteKey;
+            if (hashActive && showHiddenToggle && !showHiddenToggle.checked) {
+                showHiddenToggle.checked = true;
+            }
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const classFilter = document.getElementById('classFilter').value;
+            const poolFilter = document.getElementById('poolFilter')?.value || '';
+
+            filteredAbilities = allAbilities.filter(ability => {
+                const localizedName = getLocalizedText(ability.ability_name_texts, ability.ability_name).toLowerCase();
+                const localizedDescription = getLocalizedText(ability.description_texts, ability.description).toLowerCase();
+                const codeName = (ability.ability_code || '').toLowerCase();
+                let matchesSearch = true;
+                if (search.startsWith('#')) {
+                    const poolSearch = parseHashQuery(search).toLowerCase();
+                    if (poolSearch) {
+                        const poolTags = Array.isArray(ability.ability_pools)
+                            ? ability.ability_pools
+                            : [];
+                        matchesSearch = poolTags.some(tag => {
+                            const rawTag = String(tag).toLowerCase();
+                            const localizedTag = localizePoolTag(tag).toLowerCase();
+                            return rawTag.includes(poolSearch) || localizedTag.includes(poolSearch);
+                        });
+                    }
+                } else {
+                    matchesSearch = localizedName.includes(search)
+                        || localizedDescription.includes(search)
+                        || (codeName && codeName.includes(search));
+                }
+
+                let matchesClass = true;
+                if (classFilter) {
+                    if (classFilter === '__null__') {
+                        // Match entries with no class
+                        matchesClass = !ability.ability_class;
+                    } else {
+                        matchesClass = ability.ability_class === classFilter;
+                    }
+                }
+
+                let matchesPool = true;
+                if (poolFilter) {
+                    const poolTags = Array.isArray(ability.ability_pools)
+                        ? ability.ability_pools
+                        : [];
+                    matchesPool = poolTags.includes(poolFilter);
+                }
+
+                return matchesSearch && matchesClass && matchesPool;
+            });
+
+            currentPage = 1;
+            displayAbilities(filteredAbilities);
+        }
+
+        // Modal functions
+        function openModal(src, name) {
+            const modal = document.getElementById('imageModal');
+            const img = document.getElementById('modalImage');
+            img.src = src;
+            img.alt = name;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('imageModal').onclick = function (event) {
+            if (event.target === this) {
+                closeModal();
+            }
+        }
+
+        function openTargetModal(abilityName, targetText, isUpgrade, isDashAttack, extraWarning) {
+            const modal = document.getElementById('targetModal');
+            const titleEl = document.getElementById('targetModalTitle');
+            const modalTitle = isUpgrade ? t('rangeModalTitleUpgraded') : t('rangeModalTitle');
+            const displayName = abilityName || '';
+
+            titleEl.textContent = displayName ? `${modalTitle} — ${displayName}` : modalTitle;
+            if (targetRenderer && typeof targetRenderer.render === 'function') {
+                targetRenderer.render(targetText || '', {
+                    isDashAttack: !!isDashAttack,
+                    extraWarning: extraWarning || ''
+                });
+            } else {
+                const fallbackBody = document.getElementById('targetModalBody');
+                if (fallbackBody) {
+                    fallbackBody.textContent = targetText || t('targetModalEmpty');
+                }
+            }
+            modal.style.display = 'block';
+            modal.scrollTop = 0;
+            const modalCard = modal.querySelector('.target-modal-card');
+            if (modalCard) {
+                modalCard.scrollTop = 0;
+            }
+        }
+
+        function closeTargetModal() {
+            document.getElementById('targetModal').style.display = 'none';
+            if (targetRenderer && typeof targetRenderer.clearHover === 'function') {
+                targetRenderer.clearHover();
+            }
+        }
+
+        document.getElementById('targetModal').onclick = function (event) {
+            if (event.target === this) {
+                closeTargetModal();
+            }
+        }
+
+
+        function withAttributeIcons(text) {
+            if (!text) {
+                return '';
+            }
+            const escaped = escapeHtml(text);
+            const functionIconMap = {
+                bonus_melee_ability_damage: 'formula-melee',
+                bonus_basic_spell_damage: 'formula-unknown',
+                bonus_spell_damage_display: 'formula-unknown',
+                bonus_ranged_damage: 'formula-ranged',
+                bonus_melee_damage: 'formula-melee-ability'
+            };
+            const withFunctionIcons = escaped.replace(
+                /\b(bonus_melee_ability_damage|bonus_basic_spell_damage|bonus_spell_damage_display|bonus_ranged_damage|bonus_melee_damage)\b/g,
+                (match) => {
+                    const icon = functionIconMap[match];
+                    return `<img src="res/formula-icons/${icon}.svg" alt="${match}" class="formula-icon">`;
+                }
+            );
+            const iconMap = {
+                str: 'str',
+                dex: 'dex',
+                con: 'con',
+                int: 'int',
+                spd: 'spd',
+                lck: 'lck',
+                cha: 'cha'
+            };
+            return withFunctionIcons.replace(/\b(str|dex|con|int|spd|lck|cha)\b/gi, (match) => {
+                const key = match.toLowerCase();
+                const icon = mapFontIconName(iconMap[key]);
+                return `<img src="res/fonticon/${icon}.png" alt="${match}" class="img-icon img-icon-stat">`;
+            });
+        }
+
+        function withAttributeIconsHtml(text) {
+            if (!text) {
+                return '';
+            }
+            const functionIconMap = {
+                bonus_melee_ability_damage: 'formula-melee',
+                bonus_basic_spell_damage: 'formula-unknown',
+                bonus_spell_damage_display: 'formula-unknown',
+                bonus_ranged_damage: 'formula-ranged',
+                bonus_melee_damage: 'formula-melee-ability'
+            };
+            const withFunctionIcons = text.replace(
+                /\b(bonus_melee_ability_damage|bonus_basic_spell_damage|bonus_spell_damage_display|bonus_ranged_damage|bonus_melee_damage)\b/g,
+                (match) => {
+                    const icon = functionIconMap[match];
+                    return `<img src="res/formula-icons/${icon}.svg" alt="${match}" class="formula-icon">`;
+                }
+            );
+            const iconMap = {
+                str: 'str',
+                dex: 'dex',
+                con: 'con',
+                int: 'int',
+                spd: 'spd',
+                lck: 'lck',
+                cha: 'cha'
+            };
+            return withFunctionIcons.replace(/\b(str|dex|con|int|spd|lck|cha)\b/gi, (match) => {
+                const key = match.toLowerCase();
+                const icon = mapFontIconName(iconMap[key]);
+                return `<img src="res/fonticon/${icon}.png" alt="${match}" class="img-icon img-icon-stat">`;
+            });
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', () => {
+            updateClearButtonVisibility();
+            filterAbilities();
+        });
+        document.getElementById('clearButton').addEventListener('click', clearSearch);
+        document.getElementById('classFilter').addEventListener('change', filterAbilities);
+        document.getElementById('poolFilter').addEventListener('change', handlePoolSelection);
+        document.getElementById('showFilePoolsToggle').addEventListener('change', (event) => {
+            showFilePools = event.target.checked;
+            const poolFilter = document.getElementById('poolFilter');
+            const selected = poolFilter ? poolFilter.value : '';
+            const resetSelection = !showFilePools && isFilePoolTag(selected);
+            const nextSelection = resetSelection ? '' : selected;
+            populatePoolFilter(nextSelection);
+            if (poolFilter && resetSelection) {
+                poolFilter.value = '';
+            }
+            filterAbilities();
+        });
+        document.querySelectorAll('.lang-link').forEach(button => {
+            button.addEventListener('click', () => {
+                const selectedLang = button.getAttribute('data-lang');
+                setLanguage(selectedLang);
+            });
+        });
+        document.getElementById('showHiddenToggle').addEventListener('change', filterAbilities);
+        document.getElementById('formulaButton').addEventListener('click', () => {
+            document.getElementById('formulaModal').style.display = 'block';
+        });
+        document.getElementById('formulaClose').addEventListener('click', () => {
+            document.getElementById('formulaModal').style.display = 'none';
+        });
+        document.getElementById('pagePrev').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage -= 1;
+                displayAbilities(currentDisplayAbilities);
+            }
+        });
+        document.getElementById('pageNext').addEventListener('click', () => {
+            currentPage += 1;
+            displayAbilities(currentDisplayAbilities);
+        });
+        document.getElementById('pageSizeSelect').addEventListener('change', (event) => {
+            clearHashPromotion();
+            pageSize = Number.parseInt(event.target.value, 10);
+            if (Number.isNaN(pageSize)) {
+                pageSize = 50;
+            }
+            currentPage = 1;
+            displayAbilities(currentDisplayAbilities);
+        });
+        document.getElementById('pagePrevBottom').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage -= 1;
+                displayAbilities(currentDisplayAbilities);
+            }
+        });
+        document.getElementById('pageNextBottom').addEventListener('click', () => {
+            currentPage += 1;
+            displayAbilities(currentDisplayAbilities);
+        });
+        document.getElementById('pageSizeSelectBottom').addEventListener('change', (event) => {
+            clearHashPromotion();
+            pageSize = Number.parseInt(event.target.value, 10);
+            if (Number.isNaN(pageSize)) {
+                pageSize = 50;
+            }
+            currentPage = 1;
+            displayAbilities(currentDisplayAbilities);
+        });
+        window.addEventListener('hashchange', () => {
+            updateHashPromotion('ability');
+            currentPage = 1;
+            filterAbilities(true);
+            scrollToHash('ability');
+        });
+
+        // Apply language immediately when DOM is ready (before data loads)
+        document.addEventListener('DOMContentLoaded', () => {
+            updateHashPromotion('ability');
+            applyUiLanguage();
+            if (targetRenderer && typeof targetRenderer.init === 'function') {
+                targetRenderer.init();
+            }
+            initAnnouncement();
+            maybeShowAnnouncement();
+        });
+
+        // Load on page load
+        window.addEventListener('load', loadAbilities);
+    </script>
+</body>
+
+</html>

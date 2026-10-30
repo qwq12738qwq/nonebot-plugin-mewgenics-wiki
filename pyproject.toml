@@ -1,0 +1,24 @@
+[project]
+name = "nonebot-plugin-mewgenics-wiki"
+version = "0.1.0"
+description = "Mewgenics Wiki 图鉴查询插件，生成站点风格卡片"
+requires-python = ">=3.10"
+dependencies = [
+    "nonebot2>=2.5.0",
+    "nonebot-adapter-onebot>=2.4.0",
+    "nonebot-plugin-htmlrender[playwright]>=0.8.0,<0.9",
+    "nonebot-plugin-localstore>=0.7.4",
+]
+
+[project.entry-points.nonebot]
+mewgenics_wiki = "nonebot_plugin_mewgenics_wiki"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.build]
+includes = ["nonebot_plugin_mewgenics_wiki"]
