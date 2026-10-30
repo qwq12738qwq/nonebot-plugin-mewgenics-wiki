@@ -45,7 +45,7 @@ async def _render_png(
         "quality": None,
         "device_scale_factor": device_pixel_ratio,
         "screenshot_timeout": timeout_seconds * 1000,
-        "viewport": {"width": width, "height": 800},
+        "viewport": {"width": width, "height": 10},
     }
     if HTMLRENDER_VERSION >= (0, 7, 0):
         kwargs["full_page"] = True
