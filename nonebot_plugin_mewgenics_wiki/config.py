@@ -5,6 +5,7 @@ class Config(BaseModel):
     mewgenics_wiki_card_width: int = Field(default=1200, ge=600)
     mewgenics_wiki_device_pixel_ratio: float = Field(default=1.0, ge=1.0, le=4.0)
     mewgenics_wiki_max_results: int = Field(default=3, ge=1, le=10)
+    mewgenics_wiki_fuzzy_threshold: float = Field(default=0.6, ge=0.0, le=1.0)
     mewgenics_wiki_cache_cards: bool = True
     mewgenics_wiki_render_timeout: int = Field(default=30, ge=5)
 

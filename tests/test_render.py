@@ -1,5 +1,3 @@
-import asyncio
-
 from nonebot import get_plugin_config
 
 from nonebot_plugin_mewgenics_wiki.config import Config
@@ -32,11 +30,11 @@ async def _render_all(config: Config) -> None:
         assert len(png) > 5000
 
 
-def test_render_all_cards():
+def test_render_all_cards(event_loop):
     config = get_plugin_config(Config).model_copy(
         update={
             "mewgenics_wiki_card_width": 900,
             "mewgenics_wiki_cache_cards": False,
         }
     )
-    asyncio.run(_render_all(config))
+    event_loop.run_until_complete(_render_all(config))
