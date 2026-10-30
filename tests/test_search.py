@@ -1,4 +1,8 @@
-from nonebot_plugin_mewgenics_wiki.data import load_category, search
+from nonebot_plugin_mewgenics_wiki.data import (
+    is_exact_match,
+    load_category,
+    search,
+)
 
 
 def test_categories_are_loaded():
@@ -28,6 +32,19 @@ def test_class_search():
     assert results
     assert results[0].code == "Tank"
     assert search("class", "Necromancer", 3)[0].code == "Necromancer"
+
+
+def test_class_exact_and_alias():
+    mage = search("class", "法师", 1)[0]
+    assert mage.code == "Mage"
+    assert is_exact_match(mage, "法师")
+    assert not is_exact_match(mage, "法")
+
+    necromancer = search("class", "亡灵法师", 1)[0]
+    assert necromancer.code == "Necromancer"
+    assert is_exact_match(necromancer, "亡灵法师")
+
+    assert search("class", "死灵法师", 1)[0].code == "Necromancer"
 
 
 def test_missing_query():

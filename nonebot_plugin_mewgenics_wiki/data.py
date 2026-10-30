@@ -32,6 +32,10 @@ CLASS_LABELS = {
     "Colorless": "无项圈",
 }
 
+CLASS_ALIASES = {
+    "Necromancer": ("亡灵法师",),
+}
+
 
 @dataclass(frozen=True)
 class WikiEntry:
@@ -43,6 +47,7 @@ class WikiEntry:
     description_en: str
     raw: dict[str, Any]
     search_text: str
+    aliases: tuple[str, ...] = ()
 
     @property
     def title(self) -> str:
@@ -332,6 +337,7 @@ def load_classes() -> tuple[WikiEntry, ...]:
                     "abilities": class_abilities,
                 },
                 f"{label}\n{class_name}\n职业".casefold(),
+                aliases=CLASS_ALIASES.get(class_name, ()),
             )
         )
     return tuple(classes)
@@ -374,7 +380,7 @@ def load_category(category: str) -> tuple[WikiEntry, ...]:
 def _score(entry: WikiEntry, query: str) -> int | None:
     names = [
         name.casefold()
-        for name in (entry.name_zh, entry.name_en)
+        for name in (entry.name_zh, entry.name_en, *entry.aliases)
         if name
     ]
     code = entry.code.casefold()
@@ -392,6 +398,12 @@ def _score(entry: WikiEntry, query: str) -> int | None:
     if query and query in entry.search_text:
         return 4
     return None
+
+
+def is_exact_match(entry: WikiEntry, query: str) -> bool:
+    needle = query.strip().casefold()
+    names = (entry.name_zh, entry.name_en, *entry.aliases)
+    return any(name and name.casefold() == needle for name in names)
 
 
 def search(category: str, query: str, limit: int = 3) -> list[WikiEntry]:
