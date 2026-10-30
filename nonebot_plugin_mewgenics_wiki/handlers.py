@@ -45,7 +45,10 @@ def make_handler(category: str, trigger: str, config: Config):
             return
 
         results = search(
-            category, query, limit=config.mewgenics_wiki_max_results
+            category,
+            query,
+            limit=config.mewgenics_wiki_max_results,
+            fuzzy_threshold=config.mewgenics_wiki_fuzzy_threshold,
         )
         if not results:
             await bot.send(

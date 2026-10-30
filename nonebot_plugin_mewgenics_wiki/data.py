@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import difflib
 import hashlib
 import json
 from dataclasses import dataclass
@@ -32,10 +33,6 @@ CLASS_LABELS = {
     "Colorless": "无项圈",
 }
 
-CLASS_ALIASES = {
-    "Necromancer": ("亡灵法师",),
-}
-
 
 @dataclass(frozen=True)
 class WikiEntry:
@@ -47,7 +44,6 @@ class WikiEntry:
     description_en: str
     raw: dict[str, Any]
     search_text: str
-    aliases: tuple[str, ...] = ()
 
     @property
     def title(self) -> str:
@@ -337,7 +333,6 @@ def load_classes() -> tuple[WikiEntry, ...]:
                     "abilities": class_abilities,
                 },
                 f"{label}\n{class_name}\n职业".casefold(),
-                aliases=CLASS_ALIASES.get(class_name, ()),
             )
         )
     return tuple(classes)
@@ -380,7 +375,7 @@ def load_category(category: str) -> tuple[WikiEntry, ...]:
 def _score(entry: WikiEntry, query: str) -> int | None:
     names = [
         name.casefold()
-        for name in (entry.name_zh, entry.name_en, *entry.aliases)
+        for name in (entry.name_zh, entry.name_en)
         if name
     ]
     code = entry.code.casefold()
@@ -402,11 +397,28 @@ def _score(entry: WikiEntry, query: str) -> int | None:
 
 def is_exact_match(entry: WikiEntry, query: str) -> bool:
     needle = query.strip().casefold()
-    names = (entry.name_zh, entry.name_en, *entry.aliases)
+    names = (entry.name_zh, entry.name_en)
     return any(name and name.casefold() == needle for name in names)
 
 
-def search(category: str, query: str, limit: int = 3) -> list[WikiEntry]:
+def _name_similarity(entry: WikiEntry, query: str) -> float:
+    best = 0.0
+    for name in (entry.name_zh, entry.name_en):
+        if not name:
+            continue
+        ratio = difflib.SequenceMatcher(
+            None, query, name.casefold()
+        ).ratio()
+        best = max(best, ratio)
+    return best
+
+
+def search(
+    category: str,
+    query: str,
+    limit: int = 3,
+    fuzzy_threshold: float = 0.6,
+) -> list[WikiEntry]:
     needle = query.strip().casefold()
     if not needle:
         return []
@@ -418,4 +430,17 @@ def search(category: str, query: str, limit: int = 3) -> list[WikiEntry]:
             scored.append((score, len(entry.title), index, entry))
 
     scored.sort(key=lambda item: (item[0], item[1], item[2]))
-    return [item[3] for item in scored[:limit]]
+    if scored:
+        return [item[3] for item in scored[:limit]]
+
+    if fuzzy_threshold <= 0:
+        return []
+
+    fuzzy = []
+    for index, entry in enumerate(load_category(category)):
+        similarity = _name_similarity(entry, needle)
+        if similarity >= fuzzy_threshold:
+            fuzzy.append((similarity, len(entry.title), index, entry))
+
+    fuzzy.sort(key=lambda item: (-item[0], item[1], item[2]))
+    return [item[3] for item in fuzzy[:limit]]

@@ -37,13 +37,15 @@ def test_class_reply_behavior(event_loop):
             await send_query("绝对不存在的职业"),
         )
 
-    exact, alias, gap, missing = event_loop.run_until_complete(run())
+    exact, fuzzy, gap, missing = event_loop.run_until_complete(run())
 
     assert len(exact) == 1
     assert [segment.type for segment in exact[0]] == ["reply", "image"]
 
-    assert len(alias) == 1
-    assert [segment.type for segment in alias[0]] == ["reply", "image"]
+    assert len(fuzzy) == 1
+    assert [segment.type for segment in fuzzy[0]] == ["reply", "text", "image"]
+    assert "你可能在找" in fuzzy[0][1].data["text"]
+    assert "死灵法师" in fuzzy[0][1].data["text"]
 
     assert len(gap) == 1
     assert [segment.type for segment in gap[0]] == ["reply", "text", "image"]

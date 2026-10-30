@@ -34,7 +34,7 @@ def test_class_search():
     assert search("class", "Necromancer", 3)[0].code == "Necromancer"
 
 
-def test_class_exact_and_alias():
+def test_class_exact_and_fuzzy():
     mage = search("class", "法师", 1)[0]
     assert mage.code == "Mage"
     assert is_exact_match(mage, "法师")
@@ -42,9 +42,11 @@ def test_class_exact_and_alias():
 
     necromancer = search("class", "亡灵法师", 1)[0]
     assert necromancer.code == "Necromancer"
-    assert is_exact_match(necromancer, "亡灵法师")
+    assert not is_exact_match(necromancer, "亡灵法师")
 
-    assert search("class", "死灵法师", 1)[0].code == "Necromancer"
+    exact_necro = search("class", "死灵法师", 1)[0]
+    assert exact_necro.code == "Necromancer"
+    assert is_exact_match(exact_necro, "死灵法师")
 
 
 def test_missing_query():
